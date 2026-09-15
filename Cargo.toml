@@ -1,0 +1,12 @@
+[package]
+name = "termpaper-site"
+version = "1.0.0"
+edition = "2021"
+description = "Website for termpaper — Wallpaper Engine for the terminal. A Rust static site generator."
+default-run = "termpaper-site"
+
+[dependencies]
+maud = "0.27"
+termpaper = { path = "/home/aphrodine/Projects/termpaper" }
+rand = "0.10.2"
+png = "0.17"
