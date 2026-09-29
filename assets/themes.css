@@ -1,0 +1,105 @@
+/* Themes: the gallery, the studio and a theme's page. Same noir system:
+   flat solids, one white accent, mono for anything technical. */
+
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+
+.cat-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
+.scene-cell .badge {
+  margin-left: 0.5rem; font-family: var(--mono); font-size: 0.7rem;
+  border: 1px solid var(--line-bright); padding: 0 0.35rem; color: var(--text-dim);
+}
+.scene-cell .title { color: var(--text-dim); font-size: 0.85rem; }
+.scene-cell .variants { color: var(--text-faint); font-family: var(--mono); font-size: 0.75rem; margin-top: 0.3rem; }
+
+/* ---------- gallery ---------- */
+
+.theme-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+.theme-toolbar input[type="search"], .theme-toolbar select,
+.studio input, .studio-actions input, .studio-actions textarea, .studio select {
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--line-bright);
+  font-family: var(--mono); font-size: 0.9rem; padding: 0.45rem 0.6rem;
+}
+.theme-toolbar input[type="search"] { flex: 1 1 18rem; min-width: 0; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip {
+  font-family: var(--mono); font-size: 0.78rem; padding: 0.15rem 0.55rem;
+  border: 1px solid var(--line-bright); background: transparent; color: var(--text-dim); cursor: pointer;
+}
+.chip:hover { color: var(--text); border-color: var(--text-dim); }
+.chip.on { background: var(--text); color: var(--ink); border-color: var(--text); }
+
+.theme-grid {
+  display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line);
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+}
+.theme-card { background: var(--panel-2); padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+.theme-card canvas, .theme-view canvas, .studio-preview canvas {
+  width: 100%; aspect-ratio: 16 / 9; image-rendering: pixelated; background: #000; display: block;
+}
+.theme-card h3 { font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+.theme-card h3 a:hover { text-decoration: underline; }
+.theme-card .by { color: var(--text-faint); font-size: 0.8rem; font-family: var(--mono); }
+.theme-card .desc { color: var(--text-dim); font-size: 0.88rem; overflow-wrap: anywhere; }
+.theme-card .meta { color: var(--text-faint); font-family: var(--mono); font-size: 0.75rem; }
+.theme-card .actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: auto; }
+.icon-btn {
+  background: transparent; color: var(--text-dim); border: 1px solid var(--line-bright);
+  font-family: var(--mono); font-size: 0.78rem; padding: 0.2rem 0.5rem; cursor: pointer;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--text-dim); }
+.icon-btn.done { color: var(--ink); background: var(--text); border-color: var(--text); }
+
+.swatches { display: flex; gap: 2px; }
+.swatches span { flex: 1; height: 0.8rem; }
+
+/* ---------- a theme's own page ---------- */
+
+.theme-view { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 60rem) { .theme-view { grid-template-columns: 3fr 2fr; } }
+.theme-view h1 { font-size: clamp(1.6rem, 3vw, 2.2rem); overflow-wrap: anywhere; }
+.theme-view .code {
+  font-family: var(--mono); font-size: 0.75rem; word-break: break-all; color: var(--text-dim);
+  border: 1px solid var(--line-bright); padding: 0.6rem; background: var(--panel-2);
+}
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; font-family: var(--mono); font-size: 0.82rem; }
+.kv dt { color: var(--text-faint); }
+.kv dd { color: var(--text-dim); overflow-wrap: anywhere; }
+
+/* ---------- studio ---------- */
+
+.studio { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 60rem) { .studio { grid-template-columns: 3fr 2fr; } }
+.studio-preview { display: flex; flex-direction: column; gap: 0.75rem; position: sticky; top: 5rem; align-self: start; }
+.studio-controls { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+.control-group h3 { font-size: 0.8rem; font-family: var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+.control { display: grid; grid-template-columns: 8.5rem 1fr 4rem; gap: 0.6rem; align-items: center; font-size: 0.85rem; }
+.control label { color: var(--text-dim); }
+.control output { font-family: var(--mono); font-size: 0.78rem; color: var(--text-faint); text-align: right; }
+.control input[type="range"] { width: 100%; accent-color: #ffffff; }
+.control select { width: 100%; }
+.palette-editor { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.palette-editor input[type="color"] { width: 2.2rem; height: 2rem; padding: 0; border: 1px solid var(--line-bright); background: none; }
+.effects-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.35rem 1rem; }
+.effect { display: grid; grid-template-columns: 1.2rem 5.5rem 1fr; gap: 0.4rem; align-items: center; font-size: 0.82rem; color: var(--text-dim); }
+.effect input[type="range"] { width: 100%; accent-color: #ffffff; }
+.studio-actions { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.6rem; max-width: 46rem; }
+.studio-actions label { display: flex; flex-direction: column; gap: 0.25rem; color: var(--text-faint); font-size: 0.8rem; font-family: var(--mono); }
+.studio-actions .field-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+.studio-actions .field-row label { flex: 1 1 12rem; }
+.studio-actions textarea { width: 100%; resize: vertical; }
+.studio-actions details summary { cursor: pointer; color: var(--text-dim); }
+.token {
+  font-family: var(--mono); border: 1px solid var(--text); padding: 0.6rem; margin-top: 0.6rem; word-break: break-all;
+}
+#studio-status.bad { color: #ff8f8f; }
+.control-group .note { margin: -0.1rem 0 0.6rem; max-width: 40rem; }
+.palette-colour { display: inline-flex; align-items: center; gap: 2px; }
+.palette-colour .icon-btn { padding: 0.1rem 0.35rem; }
+.effect label { cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.effect input[type="range"]:disabled { opacity: 0.35; }
+.studio-controls .btn-row select { flex: 1 1 12rem; }
+.theme-view h3 { font-size: 0.8rem; font-family: var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.theme-view ul { padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.theme-view .install-list, #how .install-list { gap: 0.6rem; margin: 0; }

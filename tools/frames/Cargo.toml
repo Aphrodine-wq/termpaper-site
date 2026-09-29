@@ -1,0 +1,13 @@
+[package]
+name = "termpaper-frames"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Captures the site's scene sprites and theme-preview strips from the real termpaper engine. Run locally; needs a termpaper checkout beside this repo (and a GPU for the Studio strips)."
+
+[dependencies]
+termpaper = { path = "../../../termpaper" }
+rand = "0.10"
+png = "0.17"
+
+[workspace]

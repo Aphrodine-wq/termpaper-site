@@ -1,2 +1,12 @@
 target/
-dist/
+node_modules/
+.vercel/
+# dist/ holds the rendered pages (cargo run) and the bundled scripts (npm
+# run build), committed so a deploy needs neither Rust nor a rebuild of what
+# was tested. What both builds only copy from assets/ is not committed.
+dist/sprites/
+dist/frames/
+dist/style.css
+dist/themes.css
+dist/catalog.json
+dist/themes/builtin.json

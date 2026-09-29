@@ -30,7 +30,8 @@ pub fn page() -> Markup {
         }
         section.band.tall {
             div.page.center {
-                p.mono.dim { "22 stackable filters — noir · vignette · grain · scanlines · bloom · chroma · …" }
+                p.mono.dim { "27 stackable effects, each with a strength — noir · vignette · grain · bloom · halation · tilt-shift · …" }
+                p.mono.dim.mt-1 { "34 themes built in, and a gallery of everyone's: " a href="/themes/" { "termpaper themes" } }
             }
         }
     }

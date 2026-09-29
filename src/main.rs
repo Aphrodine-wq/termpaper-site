@@ -12,6 +12,7 @@ mod pages {
     pub mod launcher;
     pub mod install;
     pub mod scenes;
+    pub mod themes;
 }
 
 use std::fs;
@@ -45,8 +46,15 @@ fn main() {
     write_page(dist, "about", Page { title: "About — termpaper", active: "about", content: pages::about::page() });
     write_page(dist, "install", Page { title: "Install — termpaper", active: "install", content: pages::install::page() });
     write_page(dist, "scenes", Page { title: "Scenes — termpaper", active: "scenes", content: pages::scenes::page() });
+    write_page(dist, "themes", Page { title: "Themes — termpaper", active: "themes", content: pages::themes::gallery() });
+    write_page(dist, "themes/studio", Page { title: "Theme studio — termpaper", active: "themes", content: pages::themes::studio() });
+    write_page(dist, "themes/view", Page { title: "Theme — termpaper", active: "themes", content: pages::themes::view() });
 
     fs::copy("assets/style.css", dist.join("style.css")).unwrap();
+    fs::copy("assets/themes.css", dist.join("themes.css")).unwrap();
     copy_dir(Path::new("assets/sprites"), &dist.join("sprites"));
+    copy_dir(Path::new("assets/frames"), &dist.join("frames"));
+    fs::copy("assets/themes/builtin.json", dist.join("themes/builtin.json")).unwrap();
+    fs::copy("assets/catalog.json", dist.join("catalog.json")).unwrap();
     println!("done -> dist/");
 }

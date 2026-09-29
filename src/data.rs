@@ -1,9 +1,13 @@
 //! All site content, ported from the termpaper README and src/scene/mod.rs.
 
 pub struct Scene {
-    pub name: &'static str,
-    pub desc: &'static str,
+    pub name: String,
+    pub title: String,
+    pub desc: String,
     pub icon: &'static str,
+    pub category: String,
+    pub studio: bool,
+    pub variants: Vec<String>,
 }
 
 pub struct Tool {
@@ -22,11 +26,11 @@ pub const GITHUB_PROFILE: &str = "https://github.com/Aphrodine-wq";
 pub const TOOLS: &[Tool] = &[
     Tool {
         name: "termpaper",
-        desc: "Wallpaper Engine for the terminal. 47 hand-animated truecolor worlds rendered live in your terminal at up to 120 fps.",
+        desc: "Wallpaper Engine for the terminal. 101 scenes, 50 of them real places rendered live on your GPU, in any terminal on Linux, macOS and Windows.",
         icon: "ph-wallpaper",
         href: "/scenes/",
         cta: "Browse scenes",
-        pills: &["47 scenes", "22 filters", "120 fps"],
+        pills: &["101 scenes", "34 themes", "27 effects"],
     },
     Tool {
         name: "tui-launcher",
@@ -65,10 +69,14 @@ pub const BINARY_INSTALL: &str =
 
 pub const PATH_FIX: &str = "export PATH=\"$HOME/.cargo/bin:$PATH\"";
 
+pub const WINDOWS_INSTALL: &str =
+    "irm https://raw.githubusercontent.com/Aphrodine-wq/termpaper/main/install.ps1 | iex";
+
 pub const FILTERS: &[&str] = &[
     "scanlines", "vignette", "grain", "warm", "cool", "hue", "crt", "bloom", "duotone",
     "pixelate", "chroma", "spectrum", "edges", "thermal", "warp", "invert", "sepia",
-    "posterize", "gamma", "sharpen", "mirror", "noir",
+    "posterize", "gamma", "sharpen", "mirror", "noir", "letterbox", "halation", "dither",
+    "tiltshift", "kaleido",
 ];
 
 pub const LIST_EXCERPT: &[(&str, &str)] = &[
@@ -80,52 +88,107 @@ pub const LIST_EXCERPT: &[(&str, &str)] = &[
     ("abyss", "deep underwater: god rays, fish schools, leviathans"),
 ];
 
-pub const SCENES: &[Scene] = &[
-    Scene { name: "rain", desc: "rain on glass, droplet trails and splashes", icon: "ph-cloud-rain" },
-    Scene { name: "starfield", desc: "warp-speed stars flying from center", icon: "ph-star-four" },
-    Scene { name: "fire", desc: "Doom-style fire with a tuned palette", icon: "ph-fire" },
-    Scene { name: "pipes", desc: "Windows 95 pipes screensaver homage", icon: "ph-pipe" },
-    Scene { name: "plasma", desc: "classic demoscene plasma, hue-cycling sine waves", icon: "ph-wave-sine" },
-    Scene { name: "aurora", desc: "northern lights over a starry night sky", icon: "ph-sparkle" },
-    Scene { name: "life", desc: "Conway's Game of Life with cooling trails, auto-reseed", icon: "ph-squares-four" },
-    Scene { name: "boids", desc: "flocking birds with trails, wrap-around edges", icon: "ph-bird" },
-    Scene { name: "lava", desc: "lava-lamp metaballs, deep red to yellow-hot", icon: "ph-drop" },
-    Scene { name: "tunnel", desc: "texture-mapped tunnel flight, demoscene style", icon: "ph-disc" },
-    Scene { name: "dvd", desc: "the bouncing DVD logo meme", icon: "ph-disc" },
-    Scene { name: "bump", desc: "lo-fi deadpan TV bumpers, white on black", icon: "ph-television" },
-    Scene { name: "canopy", desc: "tree canopy growing from above, organic branching", icon: "ph-tree" },
-    Scene { name: "finale", desc: "grand-finale fireworks: crackle, crossettes, salvos", icon: "ph-confetti" },
-    Scene { name: "ocean", desc: "night ocean swells under a moonlit glint path", icon: "ph-waves" },
-    Scene { name: "circuits", desc: "circuit-board traces with zipping data pulses", icon: "ph-circuitry" },
-    Scene { name: "clouds", desc: "daytime sky with drifting fractal clouds", icon: "ph-cloud" },
-    Scene { name: "mandel", desc: "Mandelbrot deep zoom into seahorse valley", icon: "ph-spiral" },
-    Scene { name: "meteors", desc: "meteor shower with ion trails and bolides", icon: "ph-shooting-star" },
-    Scene { name: "koi", desc: "koi pond from above: ripples, lily pads, gliding fish", icon: "ph-fish" },
-    Scene { name: "sand", desc: "falling-sand automaton piling stratified dunes", icon: "ph-hourglass" },
-    Scene { name: "city", desc: "rainy neon metropolis with lightning and traffic", icon: "ph-city" },
-    Scene { name: "abyss", desc: "deep underwater: god rays, fish schools, leviathans", icon: "ph-anchor" },
-    Scene { name: "den", desc: "a cozy room with a CRT playing other scenes", icon: "ph-couch" },
-    Scene { name: "traffic", desc: "aerial night traffic, long-exposure light streams", icon: "ph-car" },
-    Scene { name: "nexus", desc: "glowing nodes linked into a drifting graph, pulses riding edges", icon: "ph-share-network" },
-    Scene { name: "ripple", desc: "still black water: raindrop rings, drifting leaves, night breeze", icon: "ph-target" },
-    Scene { name: "fireflies", desc: "amber fireflies drifting over a black meadow", icon: "ph-lightbulb" },
-    Scene { name: "lanterns", desc: "paper lanterns rising through a black festival night", icon: "ph-candle" },
-    Scene { name: "frost", desc: "fern-like frost crystals creeping across black glass", icon: "ph-snowflake" },
-    Scene { name: "orbits", desc: "planets tracing luminous orbital trails around a star", icon: "ph-planet" },
-    Scene { name: "ribbons", desc: "silk ribbons flowing across the dark", icon: "ph-wind" },
-    Scene { name: "sonar", desc: "phosphor radar sweep lighting up drifting contacts", icon: "ph-radar" },
-    Scene { name: "tide", desc: "luminous contour ridges morphing like a slow signal", icon: "ph-waveform" },
-    Scene { name: "clockwork", desc: "interlocking brass gears turning in the dark", icon: "ph-gear" },
-    Scene { name: "grid", desc: "synthwave perspective grid rolling to the horizon", icon: "ph-grid-four" },
-    Scene { name: "inkdrop", desc: "ink blooming through still black water", icon: "ph-drop-half" },
-    Scene { name: "mosaic", desc: "stained-glass cells breathing and flashing on black", icon: "ph-squares-four" },
-    Scene { name: "harmonograph", desc: "glowing spiro curves drawing themselves, then fading", icon: "ph-spiral" },
-    Scene { name: "nebula", desc: "deep-space clouds drifting in parallax layers", icon: "ph-stars" },
-    Scene { name: "pendulum", desc: "pendulum-wave interference, glowing bobs on faint strings", icon: "ph-timer" },
-    Scene { name: "reaction", desc: "reaction-diffusion coral growing and splitting on black", icon: "ph-atom" },
-    Scene { name: "meadow", desc: "windswept night grass, dew glints, shooting stars", icon: "ph-grass" },
-    Scene { name: "airspace", desc: "realistic sky over fields with planes, contrails, and low passes", icon: "ph-airplane" },
-    Scene { name: "aquarium", desc: "side-view tank: caustics, fish, bubbles, drifting plants", icon: "ph-fish-simple" },
-    Scene { name: "drive", desc: "driver POV at night: road scrolls, scenery rushes past", icon: "ph-steering-wheel" },
-    Scene { name: "candy", desc: "saturated sugar-rush orbs on a neon gradient", icon: "ph-candy" },
-];
+/// The scene catalog, from `termpaper list --json` (assets/catalog.json).
+#[derive(serde::Deserialize)]
+pub struct Catalog {
+    pub version: String,
+    pub scenes: Vec<CatalogScene>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct CatalogScene {
+    pub name: String,
+    pub title: String,
+    pub category: String,
+    pub category_label: String,
+    pub description: String,
+    pub variants: Vec<String>,
+    pub studio: bool,
+}
+
+pub fn catalog() -> Catalog {
+    serde_json::from_str(include_str!("../assets/catalog.json")).expect("assets/catalog.json")
+}
+
+/// Every scene, Studio categories first, as the site lists them.
+pub fn scenes() -> Vec<Scene> {
+    catalog()
+        .scenes
+        .into_iter()
+        .map(|c| Scene {
+            icon: icon_for(&c),
+            name: c.name,
+            title: c.title,
+            desc: c.description,
+            category: c.category_label,
+            studio: c.studio,
+            variants: c.variants,
+        })
+        .collect()
+}
+
+fn icon_for(c: &CatalogScene) -> &'static str {
+    match c.category.as_str() {
+        "coast" => "ph-waves",
+        "wilds" => "ph-mountains",
+        "weather" => "ph-cloud-sun",
+        "city" => "ph-buildings",
+        "cozy" => "ph-coffee",
+        "space" => "ph-planet",
+        _ => classic_icon(&c.name),
+    }
+}
+
+fn classic_icon(name: &str) -> &'static str {
+    match name {
+        "rain" => "ph-cloud-rain",
+        "starfield" => "ph-star-four",
+        "fire" => "ph-fire",
+        "pipes" => "ph-pipe",
+        "plasma" => "ph-wave-sine",
+        "aurora" => "ph-sparkle",
+        "life" => "ph-squares-four",
+        "boids" => "ph-bird",
+        "lava" => "ph-drop",
+        "tunnel" => "ph-disc",
+        "dvd" => "ph-disc",
+        "bump" => "ph-television",
+        "canopy" => "ph-tree",
+        "finale" => "ph-confetti",
+        "ocean" => "ph-waves",
+        "circuits" => "ph-circuitry",
+        "clouds" => "ph-cloud",
+        "mandel" => "ph-spiral",
+        "meteors" => "ph-shooting-star",
+        "koi" => "ph-fish",
+        "sand" => "ph-hourglass",
+        "city" => "ph-city",
+        "abyss" => "ph-anchor",
+        "den" => "ph-couch",
+        "traffic" => "ph-car",
+        "nexus" => "ph-share-network",
+        "ripple" => "ph-target",
+        "fireflies" => "ph-lightbulb",
+        "lanterns" => "ph-candle",
+        "frost" => "ph-snowflake",
+        "orbits" => "ph-planet",
+        "ribbons" => "ph-wind",
+        "sonar" => "ph-radar",
+        "tide" => "ph-waveform",
+        "clockwork" => "ph-gear",
+        "grid" => "ph-grid-four",
+        "inkdrop" => "ph-drop-half",
+        "mosaic" => "ph-squares-four",
+        "harmonograph" => "ph-spiral",
+        "nebula" => "ph-stars",
+        "pendulum" => "ph-timer",
+        "reaction" => "ph-atom",
+        "meadow" => "ph-grass",
+        "airspace" => "ph-airplane",
+        "aquarium" => "ph-fish-simple",
+        "drive" => "ph-steering-wheel",
+        "candy" => "ph-candy",
+        _ => "ph-sparkle",
+    }
+}
+

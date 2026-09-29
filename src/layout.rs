@@ -27,6 +27,7 @@ pub fn render(page: Page) -> Markup {
                 link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css";
                 link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css";
                 link rel="stylesheet" href="/style.css";
+                link rel="stylesheet" href="/themes.css";
             }
             body {
                 (nav(page.active))
@@ -58,6 +59,7 @@ fn nav(active: &str) -> Markup {
                     (link("/#tools", "tools", "ph ph-wrench", "tools"))
                     (link("/launcher/", "launcher", "ph ph-rocket-launch", "launcher"))
                     (link("/scenes/", "scenes", "ph ph-film-strip", "scenes"))
+                    (link("/themes/", "themes", "ph ph-palette", "themes"))
                     (link("/install/", "install", "ph ph-download-simple", "install"))
                     (link("/about/", "about", "ph ph-info", "about"))
                 }
