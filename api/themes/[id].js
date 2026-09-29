@@ -3813,9 +3813,12 @@ async function publishTheme(db2, body, ipHash) {
     if (builtin(candidate)) continue;
     try {
       const ins = await db2.query(
+        // tags go over as JSON and become text[] in SQL, whatever the driver
+        // does with JS arrays
         `insert into themes (id, name, author, description, tags, theme, code, token_hash, ip_hash)
-         values ($1, $2, $3, $4, $5, $6, $7, $8, $9) on conflict (id) do nothing returning id`,
-        [candidate, t.name, t.author, t.description, t.tags, JSON.stringify(toPlain(t)), code, hashToken(token), ipHash]
+         values ($1, $2, $3, $4, array(select jsonb_array_elements_text($5::jsonb)), $6::jsonb, $7, $8, $9)
+         on conflict (id) do nothing returning id`,
+        [candidate, t.name, t.author, t.description, JSON.stringify(t.tags), JSON.stringify(toPlain(t)), code, hashToken(token), ipHash]
       );
       if (ins[0]) id = candidate;
     } catch (e) {
