@@ -51,7 +51,12 @@ export function builtinThemes(): Promise<Listed[]> {
         likes: 0,
         builtin: true,
       })),
-    );
+    )
+    .catch(() => {
+      // try again next time; meanwhile the pages go on without them
+      builtins = undefined;
+      return [];
+    });
   return builtins;
 }
 
