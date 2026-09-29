@@ -160,6 +160,20 @@ function sanitize(l) {
   l.effects.amounts = amounts;
   return l;
 }
+function sameLook(a, b) {
+  const near = (x, y) => {
+    if (typeof x === "number" && typeof y === "number") return Math.abs(x - y) < 1e-4;
+    if (Array.isArray(x) && Array.isArray(y)) return x.length === y.length && x.every((v, i) => near(v, y[i]));
+    if (x && y && typeof x === "object" && typeof y === "object") {
+      const kx = Object.keys(x);
+      return kx.length === Object.keys(y).length && kx.every((k) => near(x[k], y[k]));
+    }
+    return x === y;
+  };
+  const names = /* @__PURE__ */ new Set([...Object.keys(a.effects.amounts), ...Object.keys(b.effects.amounts)]);
+  const amountsOk = [...names].every((n) => Math.abs((a.effects.amounts[n] ?? 1) - (b.effects.amounts[n] ?? 1)) < 51e-4);
+  return near(a.grade, b.grade) && near(a.palette, b.palette) && near(a.effects.stack, b.effects.stack) && amountsOk;
+}
 function validate(t, scenes2) {
   const w = [];
   if (t.format > FORMAT) throw new Error(`made for theme format ${t.format} (this reads ${FORMAT})`);
@@ -178,9 +192,9 @@ function validate(t, scenes2) {
   const before = t.look.effects.stack.length;
   t.look.effects.stack = t.look.effects.stack.filter((e) => EFFECTS.includes(e));
   if (t.look.effects.stack.length < before) w.push("dropped effects this termpaper does not have");
-  const raw = JSON.stringify(t.look);
+  const unclamped = structuredClone(t.look);
   sanitize(t.look);
-  if (JSON.stringify(t.look) !== raw) w.push("some values were out of range and were clamped");
+  if (!sameLook(unclamped, t.look)) w.push("some values were out of range and were clamped");
   if (t.scene && scenes2) {
     const variants = scenes2.get(t.scene.name);
     if (!variants) {
@@ -2355,290 +2369,289 @@ var catalog_default = {
 // assets/themes/builtin.json
 var builtin_default = [
   {
-    code: "tp1:JYyxCsMwDAV_RWgOha5eu_cHSgfhPCcGWzayQltK_72GbMcd3JdTsyrO4bqwSgUHvhWI8sJy-N5sCofVLh025YoRLXfPTWe5N9pMViykjboUuJ-MlBB9BPIdNCIUhLdELx-SQdkpD1pNXnqZT5dtcHiw4nCTws_fHw",
-    shelf: "Start",
     slug: "clean",
+    shelf: "Start",
+    yours: false,
+    code: "tp1:JYyxCsMwDAV_RWgOha5eu_cHSgfhPCcGWzayQltK_72GbMcd3JdTsyrO4bqwSgUHvhWI8sJy-N5sCofVLh025YoRLXfPTWe5N9pMViykjboUuJ-MlBB9BPIdNCIUhLdELx-SQdkpD1pNXnqZT5dtcHiw4nCTws_fHw",
     theme: {
-      author: "termpaper",
-      description: "No grade, no palette, no effects: the scene exactly as it is drawn.",
       format: 1,
       name: "Clean",
+      author: "termpaper",
+      description: "No grade, no palette, no effects: the scene exactly as it is drawn.",
       tags: [
         "neutral"
       ]
-    },
-    yours: false
+    }
   },
   {
-    code: "tp1:TZDBasQwDER_xeicDVvapZDj_kKPpQfhyIlZxw6SnDYs-fcq2S305tHgNyPdIRSeUKF7aSDjRNDBNRH60V3XGUWgAaw6FjZDiacZZ2Ib9iSe46yxZHM-YlqIT0yKMVPvQkxT575RRupPparzJZXKjRuRexNZGUVNEi6rk1skaQ2qOAh0n-ANYqWit9nAUXWFr_2FvfW7g6BWxkf0ub1cGvgj2hrtq2n6mYtUpt23xcLx8dye3zbzQiCvcoAU_W0PNHTMFrbEIZMqPePiI-Df3OS7McRTPqo8TybVruIppZ2BHDFbFcBgF8vFam7bLw",
-    shelf: "Cinematic",
     slug: "bleach-bypass",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:TZDBasQwDER_xeicDVvapZDj_kKPpQfhyIlZxw6SnDYs-fcq2S305tHgNyPdIRSeUKF7aSDjRNDBNRH60V3XGUWgAaw6FjZDiacZZ2Ib9iSe46yxZHM-YlqIT0yKMVPvQkxT575RRupPparzJZXKjRuRexNZGUVNEi6rk1skaQ2qOAh0n-ANYqWit9nAUXWFr_2FvfW7g6BWxkf0ub1cGvgj2hrtq2n6mYtUpt23xcLx8dye3zbzQiCvcoAU_W0PNHTMFrbEIZMqPePiI-Df3OS7McRTPqo8TybVruIppZ2BHDFbFcBgF8vFam7bLw",
     theme: {
+      format: 1,
+      name: "Bleach Bypass",
       author: "termpaper",
       description: "Silver-retained film: washed-out colour, hard contrast, heavy skies.",
+      tags: [
+        "cinematic",
+        "gritty"
+      ],
+      grade: {
+        saturation: 0.55,
+        contrast: 1.35,
+        exposure: 0.1,
+        fade: 0.04
+      },
       effects: {
-        grain: 0.5,
         stack: [
           "grain",
           "vignette"
         ],
-        vignette: 0.699999988079071
+        grain: 0.5,
+        vignette: 0.7
       },
-      format: 1,
-      grade: {
-        contrast: 1.350000023841858,
-        exposure: 0.10000000149011612,
-        fade: 0.03999999910593033,
-        saturation: 0.550000011920929
-      },
-      name: "Bleach Bypass",
       scene: {
         name: "supercell",
         variant: "afternoon"
-      },
-      tags: [
-        "cinematic",
-        "gritty"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:LZBNbsQgDIWvgrxGUTqqqja7buYSVRcuOAlq-JExncUod69hZgU8np8_-w5r5ogCy4uFhJFggSt68uYajggWsMmeWVUhjgULsYqequNQJOSkP5_J5MObwiHJYo6wipb_HOh-qzU165ONy0dubA2aG3I0DqsYTN5sjCFNGim4VVi-wIVEyhOcan8aiBvBtwX1eWW7Q0VpjI_O8_RuweUkrHH9-aE5FJWxm6grOtU6KvX6aqHu6POt9qC9qXqZ52nWIWNuaSRcztMCrSs5Ga4qOkbnGqBPkjB6v6mzOkoD67m6ghxqJ9cTe2LfX4sJzvMf",
-    shelf: "Cinematic",
     slug: "faded-film",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:LZBNbsQgDIWvgrxGUTqqqja7buYSVRcuOAlq-JExncUod69hZgU8np8_-w5r5ogCy4uFhJFggSt68uYajggWsMmeWVUhjgULsYqequNQJOSkP5_J5MObwiHJYo6wipb_HOh-qzU165ONy0dubA2aG3I0DqsYTN5sjCFNGim4VVi-wIVEyhOcan8aiBvBtwX1eWW7Q0VpjI_O8_RuweUkrHH9-aE5FJWxm6grOtU6KvX6aqHu6POt9qC9qXqZ52nWIWNuaSRcztMCrSs5Ga4qOkbnGqBPkjB6v6mzOkoD67m6ghxqJ9cTe2LfX4sJzvMf",
     theme: {
+      format: 1,
+      name: "Faded Film",
       author: "termpaper",
       description: "An old print: lifted blacks, softer colour, a warm cast and grain.",
-      effects: {
-        grain: 0.6000000238418579,
-        stack: [
-          "grain"
-        ]
-      },
-      format: 1,
-      grade: {
-        contrast: 0.8999999761581421,
-        fade: 0.14000000059604645,
-        saturation: 0.800000011920929,
-        shadows: {
-          amount: 0.20000000298023224,
-          hue: 200
-        },
-        temperature: 0.10000000149011612
-      },
-      name: "Faded Film",
-      scene: {
-        name: "paris",
-        variant: "autumn"
-      },
       tags: [
         "cinematic",
         "vintage"
-      ]
-    },
-    yours: false
+      ],
+      grade: {
+        saturation: 0.8,
+        contrast: 0.9,
+        temperature: 0.1,
+        fade: 0.14,
+        shadows: {
+          hue: 200,
+          amount: 0.2
+        }
+      },
+      effects: {
+        stack: [
+          "grain"
+        ],
+        grain: 0.6
+      },
+      scene: {
+        name: "paris",
+        variant: "autumn"
+      }
+    }
   },
   {
-    code: "tp1:RZBLbsMwDESvQnBtGO7HXfgC7QG6K7pgZNoSqo8hUUmLwHcv5QTtbjQcDR55xSXlQILTQ4eRAuOEr8nPHOEt1YwdUhWbstrCOWy0cTNnLia7TVyKOnm3DJ6KwIVyAO9WK5AWELVn-pmAwokzWPWPWQGKMxCUtAgszgdYfbr0Wiu0Fpw-0LjICuWMeq0TPztcM81Kd0X-3lKpWfXQK_TZnTJFczwfR-3goIwk98Rzs1yUpgfV_xSty1YNPY39oHuGVG-xcd875GVhcwsVIfPVsCx5OlZWnD-tH140XwzHA-9-xMCFlP5M2VGrxVJjYcF9_wU",
-    shelf: "Cinematic",
     slug: "golden-hour",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:RZBLbsMwDESvQnBtGO7HXfgC7QG6K7pgZNoSqo8hUUmLwHcv5QTtbjQcDR55xSXlQILTQ4eRAuOEr8nPHOEt1YwdUhWbstrCOWy0cTNnLia7TVyKOnm3DJ6KwIVyAO9WK5AWELVn-pmAwokzWPWPWQGKMxCUtAgszgdYfbr0Wiu0Fpw-0LjICuWMeq0TPztcM81Kd0X-3lKpWfXQK_TZnTJFczwfR-3goIwk98Rzs1yUpgfV_xSty1YNPY39oHuGVG-xcd875GVhcwsVIfPVsCx5OlZWnD-tH140XwzHA-9-xMCFlP5M2VGrxVJjYcF9_wU",
     theme: {
+      format: 1,
+      name: "Golden Hour",
       author: "termpaper",
       description: "The last warm light of the day: amber highlights and a soft film glow.",
-      effects: {
-        halation: 0.6000000238418579,
-        stack: [
-          "halation"
-        ]
-      },
-      format: 1,
-      grade: {
-        exposure: 0.10000000149011612,
-        highlights: {
-          amount: 0.5,
-          hue: 35
-        },
-        temperature: 0.44999998807907104,
-        tint: 0.05000000074505806,
-        vibrance: 0.25
-      },
-      name: "Golden Hour",
-      scene: {
-        name: "mesa",
-        variant: "sunset"
-      },
       tags: [
         "cinematic",
         "warm"
-      ]
-    },
-    yours: false
+      ],
+      grade: {
+        exposure: 0.1,
+        vibrance: 0.25,
+        temperature: 0.45,
+        tint: 0.05,
+        highlights: {
+          hue: 35,
+          amount: 0.5
+        }
+      },
+      effects: {
+        stack: [
+          "halation"
+        ],
+        halation: 0.6
+      },
+      scene: {
+        name: "mesa",
+        variant: "sunset"
+      }
+    }
   },
   {
-    code: "tp1:VZBNasQwDIWvYrQ2IQnNJlfortvShcbWxAb_BNnOMAy5e-UwULrwQs9PT5_0gnvmiBXWSUPCSLDCZ7ZoHGcpNGCrLrOolTjuuBOLaKkY9nv1OcnPlzdOq4K1MVayqgRvSd19iKuyRLtiskWrB3JUTwohP6QqlXPa1C00KoNEVtwKrN9gfCLh8Ua0wx_ewo-GjdEK2QveQ6650zAvGkxOlbH0BYZp6T03xmTEPQ6zxFIU5N51KZNIxaEVhB7nmqjzOA6jLBpzS_UyLacG5zcX5NU_48fy3zcvpxiLoXSxva_n8MCEnR7ZY3eCxSec5y8",
-    shelf: "Cinematic",
     slug: "kodachrome",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:VZBNasQwDIWvYrQ2IQnNJlfortvShcbWxAb_BNnOMAy5e-UwULrwQs9PT5_0gnvmiBXWSUPCSLDCZ7ZoHGcpNGCrLrOolTjuuBOLaKkY9nv1OcnPlzdOq4K1MVayqgRvSd19iKuyRLtiskWrB3JUTwohP6QqlXPa1C00KoNEVtwKrN9gfCLh8Ua0wx_ewo-GjdEK2QveQ6650zAvGkxOlbH0BYZp6T03xmTEPQ6zxFIU5N51KZNIxaEVhB7nmqjzOA6jLBpzS_UyLacG5zcX5NU_48fy3zcvpxiLoXSxva_n8MCEnR7ZY3eCxSec5y8",
     theme: {
+      format: 1,
+      name: "Kodachrome",
       author: "termpaper",
       description: "Rich, saturated slide film: deep reds, warm yellows, strong blues.",
-      format: 1,
-      grade: {
-        contrast: 1.149999976158142,
-        highlights: {
-          amount: 0.25,
-          hue: 45
-        },
-        saturation: 1.25,
-        shadows: {
-          amount: 0.15000000596046448,
-          hue: 200
-        },
-        temperature: 0.11999999731779099,
-        vibrance: 0.20000000298023224
-      },
-      name: "Kodachrome",
-      scene: {
-        name: "havana",
-        variant: "day"
-      },
       tags: [
         "cinematic",
         "vivid"
-      ]
-    },
-    yours: false
+      ],
+      grade: {
+        saturation: 1.25,
+        contrast: 1.15,
+        vibrance: 0.2,
+        temperature: 0.12,
+        shadows: {
+          hue: 200,
+          amount: 0.15
+        },
+        highlights: {
+          hue: 45,
+          amount: 0.25
+        }
+      },
+      scene: {
+        name: "havana",
+        variant: "day"
+      }
+    }
   },
   {
-    code: "tp1:LZDBbsQgDER_BflMo3SrqFWOvfcLqh5c4iRoAadgupVW-feaZE-gYXie8R1mzhEFxmcLCSPBCB_MKfhlFbCAVVbOKgrluOFGWcWJist-E89JX95DJZOafzSOOVjzUz2JNWiCFwlkJsxXytbcvKyqFp7FLIFvhpORlcwxrHRKFlwKjJ_gfCJN5Z1qjanHMQG-LCwZJ415h4JSM54p-u61OZNkLK1M179ZoL-NS81qfuq7F6VT1ALt1ykNg4Wy4sS30nhrVflyGbpee0euSRp32HclzTM5OVxF0F1bxu_AHFug83JYlecoHekey4y6zOwLaYNfzB4bFOYaAuz7Pw",
-    shelf: "Cinematic",
     slug: "moonlight",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:LZDBbsQgDER_BflMo3SrqFWOvfcLqh5c4iRoAadgupVW-feaZE-gYXie8R1mzhEFxmcLCSPBCB_MKfhlFbCAVVbOKgrluOFGWcWJist-E89JX95DJZOafzSOOVjzUz2JNWiCFwlkJsxXytbcvKyqFp7FLIFvhpORlcwxrHRKFlwKjJ_gfCJN5Z1qjanHMQG-LCwZJ415h4JSM54p-u61OZNkLK1M179ZoL-NS81qfuq7F6VT1ALt1ykNg4Wy4sS30nhrVflyGbpee0euSRp32HclzTM5OVxF0F1bxu_AHFug83JYlecoHekey4y6zOwLaYNfzB4bFOYaAuz7Pw",
     theme: {
+      format: 1,
+      name: "Moonlight",
       author: "termpaper",
       description: "Blue night: cool, quiet, a little darker, with a soft glow on the lights.",
-      effects: {
-        bloom: 0.5,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
-      grade: {
-        contrast: 1.0800000429153442,
-        exposure: -0.30000001192092896,
-        saturation: 0.699999988079071,
-        shadows: {
-          amount: 0.5,
-          hue: 225
-        },
-        temperature: -0.550000011920929
-      },
-      name: "Moonlight",
-      scene: {
-        name: "moonrise",
-        variant: "full"
-      },
       tags: [
         "cinematic",
         "cool",
         "night"
-      ]
-    },
-    yours: false
+      ],
+      grade: {
+        saturation: 0.7,
+        contrast: 1.08,
+        exposure: -0.3,
+        temperature: -0.55,
+        shadows: {
+          hue: 225,
+          amount: 0.5
+        }
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.5
+      },
+      scene: {
+        name: "moonrise",
+        variant: "full"
+      }
+    }
   },
   {
-    code: "tp1:TY_RasMwDEV_xejZhA7GGHncB-wHxh40W0lEFznIakMp-fcqbgt91JV8zvUVhqIzGvRvEQRngh6-CytEwJNNRX020nnBhfYwU03Ki3ER33z9YzoGlBzWiY3CyjaFTLSEv31TYxgVWdoFhox6DIO6pHOS4Vih_4HEQl6Ak2dzkQK_EfxV9iZXqGgnxbvt0B0ipCKmWPe-3fsWgYaBktV2a67cic3ptDOPQmb0IHJjfLzkPn46oyaSZnv8f2XJZX1CUBnFfV7ULrBtNw",
-    shelf: "Cinematic",
     slug: "noir",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:TY_RasMwDEV_xejZhA7GGHncB-wHxh40W0lEFznIakMp-fcqbgt91JV8zvUVhqIzGvRvEQRngh6-CytEwJNNRX020nnBhfYwU03Ki3ER33z9YzoGlBzWiY3CyjaFTLSEv31TYxgVWdoFhox6DIO6pHOS4Vih_4HEQl6Ak2dzkQK_EfxV9iZXqGgnxbvt0B0ipCKmWPe-3fsWgYaBktV2a67cic3ptDOPQmb0IHJjfLzkPn46oyaSZnv8f2XJZX1CUBnFfV7ULrBtNw",
     theme: {
+      format: 1,
+      name: "Noir",
       author: "termpaper",
       description: "Black and white with deep blacks, grain and a dark frame.",
+      tags: [
+        "cinematic",
+        "mono"
+      ],
+      grade: {
+        saturation: 0,
+        contrast: 1.4
+      },
       effects: {
-        grain: 0.6000000238418579,
         stack: [
           "grain",
           "vignette"
         ],
-        vignette: 0.800000011920929
+        grain: 0.6,
+        vignette: 0.8
       },
-      format: 1,
-      grade: {
-        contrast: 1.399999976158142,
-        saturation: 0
-      },
-      name: "Noir",
       scene: {
         name: "windowrain",
         variant: "city"
-      },
-      tags: [
-        "cinematic",
-        "mono"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:XZBBa8MwDIX_itE5K2mho-Qf7Lb72EFzlFgktoOtNISS_z45KRv0EBBfnp7f0wO6mDwKNOcKAnqCBj7jiClyCxXgLC4mZULJTzhRUthStokn4Rj0z0fIgkFMx6NvjOdxWM3PiHbIlUFjVwxvfSIKxmIWw8GII5MdtnFRxYLJm8WxUD6ptWCfofkCy4E0FVtldw6KCb4r6BO2mvABGWVOeCSoT7erbpLXdAVTQRcluldGLdbta_v4fLmYuFnh-Vafai3q43zIL9etAse9G_WTf-H7q25THXUd2UOkV7BDyX7nPpDIHvhv1oXimy2FvcDz1DJni2EtLTExFmfIs_d65237BQ",
-    shelf: "Cinematic",
     slug: "polaroid",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:XZBBa8MwDIX_itE5K2mho-Qf7Lb72EFzlFgktoOtNISS_z45KRv0EBBfnp7f0wO6mDwKNOcKAnqCBj7jiClyCxXgLC4mZULJTzhRUthStokn4Rj0z0fIgkFMx6NvjOdxWM3PiHbIlUFjVwxvfSIKxmIWw8GII5MdtnFRxYLJm8WxUD6ptWCfofkCy4E0FVtldw6KCb4r6BO2mvABGWVOeCSoT7erbpLXdAVTQRcluldGLdbta_v4fLmYuFnh-Vafai3q43zIL9etAse9G_WTf-H7q25THXUd2UOkV7BDyX7nPpDIHvhv1oXimy2FvcDz1DJni2EtLTExFmfIs_d65237BQ",
     theme: {
+      format: 1,
+      name: "Polaroid",
       author: "termpaper",
       description: "Instant film: milky blacks, a cyan-green cast in the shadows, warm whites.",
+      tags: [
+        "cinematic",
+        "vintage"
+      ],
+      grade: {
+        saturation: 0.85,
+        temperature: 0.2,
+        tint: 0.1,
+        fade: 0.1,
+        shadows: {
+          hue: 180,
+          amount: 0.25
+        },
+        highlights: {
+          hue: 60,
+          amount: 0.2
+        }
+      },
       effects: {
         stack: [
           "vignette"
         ],
         vignette: 0.5
       },
-      format: 1,
-      grade: {
-        fade: 0.10000000149011612,
-        highlights: {
-          amount: 0.20000000298023224,
-          hue: 60
-        },
-        saturation: 0.8500000238418579,
-        shadows: {
-          amount: 0.25,
-          hue: 180
-        },
-        temperature: 0.20000000298023224,
-        tint: 0.10000000149011612
-      },
-      name: "Polaroid",
       scene: {
         name: "tuscany",
         variant: "summer"
-      },
-      tags: [
-        "cinematic",
-        "vintage"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TZDBbsIwDIZfJTLXCsHoAPUldthx2sGkbhuN2pFjOk2Id5_T7cDN-W3__-fcYRCd0aDbN8A4E3TwTjkhNIA3m0RdMNI5YyZ1sacSNWVLwt55u_YhT2IyKuapdIEW0p8Q5So3DXZTpj6YhIvKNwfkPkQlnLduZDgW6D4gJiYHSNG1JbHL5NUsLPDZgPv2znSHKGyKpYJud6-PBjJeyWztzVJnwHzbV2u4rtabPe3bXTXetHhoXw61OuMR20ut4gnb01CrwQfjseYVU-LRJuh223ONoWGgaKXGFMP4VX0dKvGKO_LK8Afqmm-1T7o_j-5RIvEK-v_BC3GK9coFNaFDd36CcuIRHo9f",
-    shelf: "Cinematic",
     slug: "sepia",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:TZDBbsIwDIZfJTLXCsHoAPUldthx2sGkbhuN2pFjOk2Id5_T7cDN-W3__-fcYRCd0aDbN8A4E3TwTjkhNIA3m0RdMNI5YyZ1sacSNWVLwt55u_YhT2IyKuapdIEW0p8Q5So3DXZTpj6YhIvKNwfkPkQlnLduZDgW6D4gJiYHSNG1JbHL5NUsLPDZgPv2znSHKGyKpYJud6-PBjJeyWztzVJnwHzbV2u4rtabPe3bXTXetHhoXw61OuMR20ut4gnb01CrwQfjseYVU-LRJuh223ONoWGgaKXGFMP4VX0dKvGKO_LK8Afqmm-1T7o_j-5RIvEK-v_BC3GK9coFNaFDd36CcuIRHo9f",
     theme: {
+      format: 1,
+      name: "Sepia",
       author: "termpaper",
       description: "Old photographs: every colour turned to brown and cream.",
-      effects: {
-        grain: 0.4000000059604645,
-        stack: [
-          "grain",
-          "vignette"
-        ],
-        vignette: 0.6000000238418579
-      },
-      format: 1,
+      tags: [
+        "cinematic",
+        "vintage",
+        "mono"
+      ],
       grade: {
-        contrast: 1.0499999523162842
+        contrast: 1.05
       },
-      name: "Sepia",
       palette: {
+        mode: "tint",
         colors: [
           "#1e140c",
           "#4a3423",
@@ -2646,116 +2659,118 @@ var builtin_default = [
           "#c7a47f",
           "#f1e1c6"
         ],
-        mode: "tint",
-        strength: 0.8500000238418579
+        strength: 0.85
+      },
+      effects: {
+        stack: [
+          "grain",
+          "vignette"
+        ],
+        grain: 0.4,
+        vignette: 0.6
       },
       scene: {
         name: "venice",
         variant: "morning"
-      },
-      tags: [
-        "cinematic",
-        "vintage",
-        "mono"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TZBBasQwDEWvYrQ2YabQMs0Juu-ydCFsxTETy8FWEsqQu1dxWpiFwf6S3__SA4ZcEgr0VwuMiaCHz2WmYm5gARcZc1FJqKQZVVbRU3UlzhIza-UjJzIpr5Fqb0bC9ceEgpGtQbNhScZhlePhsdzNUNTCIHsTprxFDmaMYZz0SO2ULRgq9F_gIpOmik61NbLKBN8WlOw14QMqylLwjHDp3i0MrXDpLrfdAg0DOamtUdDdD-KRRWEjTue3Bovc-IFJ5N9Atf7avTy1Kvb1qe00bDy9vqlfdcQt1t8C5aDodD5vBx9LRNYNQ8iTJ4Z9_wU",
-    shelf: "Cinematic",
     slug: "super-8",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:TZBBasQwDEWvYrQ2YabQMs0Juu-ydCFsxTETy8FWEsqQu1dxWpiFwf6S3__SA4ZcEgr0VwuMiaCHz2WmYm5gARcZc1FJqKQZVVbRU3UlzhIza-UjJzIpr5Fqb0bC9ceEgpGtQbNhScZhlePhsdzNUNTCIHsTprxFDmaMYZz0SO2ULRgq9F_gIpOmik61NbLKBN8WlOw14QMqylLwjHDp3i0MrXDpLrfdAg0DOamtUdDdD-KRRWEjTue3Bovc-IFJ5N9Atf7avTy1Kvb1qe00bDy9vqlfdcQt1t8C5aDodD5vBx9LRNYNQ8iTJ4Z9_wU",
     theme: {
+      format: 1,
+      name: "Super 8",
       author: "termpaper",
       description: "Home movies: heavy grain, a warm cast, a dark frame and glowing highlights.",
+      tags: [
+        "cinematic",
+        "vintage"
+      ],
+      grade: {
+        saturation: 0.9,
+        fade: 0.08
+      },
       effects: {
-        grain: 1.2000000476837158,
-        halation: 0.5,
         stack: [
           "warm",
           "halation",
           "grain",
           "vignette"
         ],
-        vignette: 0.8999999761581421,
-        warm: 0.6000000238418579
+        grain: 1.2,
+        halation: 0.5,
+        vignette: 0.9,
+        warm: 0.6
       },
-      format: 1,
-      grade: {
-        fade: 0.07999999821186066,
-        saturation: 0.8999999761581421
-      },
-      name: "Super 8",
       scene: {
         name: "trainwindow",
         variant: "golden"
-      },
-      tags: [
-        "cinematic",
-        "vintage"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:XZCxboQwDIZfJfLQCSFoy1Beoku3qoMJhkQEByWGG068e53r6SrdYCWxP__-nStMMa0o0LcVMK4EPXwRBvNiPhPyTFAB7uJi0oJQWjfcKGlypGyT38RHLi2OzBCiXYY9K2XmhCP1RopSdjjGS67MBdNq8uLZII_G-dkFDdEKmuBFApltZ-tqlRecM_TfYD2T2vNWc6VfDxtjgJ8KbjOgv2qCJWEuO9TtawWHH9S61VpT6_M-v5Bu12T70dSNbrXGnaUwXXdW8G_nAb49ce_dqSBNE9k_Kgvapbg8_MwkQsXW416Ulc-W-Gbz_rsu8rxo6CYHJo9FG7hMhvP8BQ",
-    shelf: "Cinematic",
     slug: "teal-and-orange",
+    shelf: "Cinematic",
+    yours: false,
+    code: "tp1:XZCxboQwDIZfJfLQCSFoy1Beoku3qoMJhkQEByWGG068e53r6SrdYCWxP__-nStMMa0o0LcVMK4EPXwRBvNiPhPyTFAB7uJi0oJQWjfcKGlypGyT38RHLi2OzBCiXYY9K2XmhCP1RopSdjjGS67MBdNq8uLZII_G-dkFDdEKmuBFApltZ-tqlRecM_TfYD2T2vNWc6VfDxtjgJ8KbjOgv2qCJWEuO9TtawWHH9S61VpT6_M-v5Bu12T70dSNbrXGnaUwXXdW8G_nAb49ce_dqSBNE9k_Kgvapbg8_MwkQsXW416Ulc-W-Gbz_rsu8rxo6CYHJo9FG7hMhvP8BQ",
     theme: {
+      format: 1,
+      name: "Teal & Orange",
       author: "termpaper",
       description: "The blockbuster grade: teal shadows, warm skin and highlights, a little punch.",
+      tags: [
+        "cinematic",
+        "warm",
+        "cool"
+      ],
+      grade: {
+        contrast: 1.12,
+        vibrance: 0.2,
+        shadows: {
+          hue: 190,
+          amount: 0.55
+        },
+        highlights: {
+          hue: 30,
+          amount: 0.45
+        }
+      },
       effects: {
         stack: [
           "vignette"
         ],
         vignette: 0.5
       },
-      format: 1,
-      grade: {
-        contrast: 1.1200000047683716,
-        highlights: {
-          amount: 0.44999998807907104,
-          hue: 30
-        },
-        shadows: {
-          amount: 0.550000011920929,
-          hue: 190
-        },
-        vibrance: 0.20000000298023224
-      },
-      name: "Teal & Orange",
       scene: {
         name: "hongkong",
         variant: "night"
-      },
-      tags: [
-        "cinematic",
-        "warm",
-        "cool"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TZCxbsMwDER_RWBWI7ATO0m9du7UsehAy1QsxJIMim6HwP9eSe6QSQfyyHfiE0xghwJ9U4FHR9DDO8qyrFpbrz6CnhAqwFWmwKknxG7BhTgVR4qa7SI2-NT5DEbUglFoVjrMYWUVvEL1i-zUiPxQA0aqlOHglEykXjBRT-TomHYK3iP0X4VjPc4Zk2bTs6-G7wrujGPK-YSIsjLu_OZYdxWY0qmP9XnLEzOJFKcLuQ5ivaRVOR4XzKGhhk6Uaodzcz61bVbdrRuudVa3t6E1-f8HPeDFXLMynT5RUXocL6bNiaIw-btMGX1JZDKGtMSSUVA_MmqYQ3DZvIvkbJMzavIl4f_tNZqc5gfZYsraA6P1sG1_",
-    shelf: "Terminal palettes",
     slug: "catppuccin-mocha",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:TZCxbsMwDER_RWBWI7ATO0m9du7UsehAy1QsxJIMim6HwP9eSe6QSQfyyHfiE0xghwJ9U4FHR9DDO8qyrFpbrz6CnhAqwFWmwKknxG7BhTgVR4qa7SI2-NT5DEbUglFoVjrMYWUVvEL1i-zUiPxQA0aqlOHglEykXjBRT-TomHYK3iP0X4VjPc4Zk2bTs6-G7wrujGPK-YSIsjLu_OZYdxWY0qmP9XnLEzOJFKcLuQ5ivaRVOR4XzKGhhk6Uaodzcz61bVbdrRuudVa3t6E1-f8HPeDFXLMynT5RUXocL6bNiaIw-btMGX1JZDKGtMSSUVA_MmqYQ3DZvIvkbJMzavIl4f_tNZqc5gfZYsraA6P1sG1_",
     theme: {
+      format: 1,
+      name: "Catppuccin Mocha",
       author: "termpaper",
       description: "Soft pastel colour on a warm dark base, from the Catppuccin scheme.",
-      effects: {
-        bloom: 0.4000000059604645,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
+      tags: [
+        "terminal",
+        "dark",
+        "pastel"
+      ],
       grade: {
-        fade: 0.029999999329447746,
-        saturation: 1.0499999523162842
+        saturation: 1.05,
+        fade: 0.03
       },
-      name: "Catppuccin Mocha",
       palette: {
+        mode: "tint",
         colors: [
           "#1e1e2e",
           "#313244",
@@ -2765,41 +2780,41 @@ var builtin_default = [
           "#f5c2e7",
           "#cdd6f4"
         ],
-        mode: "tint",
-        strength: 0.6000000238418579
+        strength: 0.6
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.4
       },
       scene: {
         name: "cafe",
         variant: "rain"
-      },
+      }
+    }
+  },
+  {
+    slug: "dracula",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:LZBNjoMwDIWvErlbVE0p_WM9R5jdaBYmOBA1JMgJlaqqdx8bqizyZD_7s_0Cl3jCAu2hgogTQQvfjHYJCBXgUsbEEirE04wzsQR7ypb9XHyKkvkZyXwKTLYjTdSaeeE5kMHYm9nHuwl-GItJD2KDpke-m4HpaaKG99Kx4JCh_V0pPmJQiLjk2zrBXwUDYy_DveDhO8ZoRX_tj1LrY1F5eIsbA5Wyuqak7i1bgU0h8YrY1dcaj2eJ7ZqmuZx0y925vtTYqOr629HdVDl3udnV567yap0hF6Y4lFF5Z-GRc2RLVl4uaO8K6EJKk5o3Ic6TOLOluM71OXEefbc8Ff5A9qgrwHoOeL__AQ",
+    theme: {
+      format: 1,
+      name: "Dracula",
+      author: "termpaper",
+      description: "The Dracula scheme: purple and pink light over a dark grey night.",
       tags: [
         "terminal",
         "dark",
-        "pastel"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:LZBNjoMwDIWvErlbVE0p_WM9R5jdaBYmOBA1JMgJlaqqdx8bqizyZD_7s_0Cl3jCAu2hgogTQQvfjHYJCBXgUsbEEirE04wzsQR7ypb9XHyKkvkZyXwKTLYjTdSaeeE5kMHYm9nHuwl-GItJD2KDpke-m4HpaaKG99Kx4JCh_V0pPmJQiLjk2zrBXwUDYy_DveDhO8ZoRX_tj1LrY1F5eIsbA5Wyuqak7i1bgU0h8YrY1dcaj2eJ7ZqmuZx0y925vtTYqOr629HdVDl3udnV567yap0hF6Y4lFF5Z-GRc2RLVl4uaO8K6EJKk5o3Ic6TOLOluM71OXEefbc8Ff5A9qgrwHoOeL__AQ",
-    shelf: "Terminal palettes",
-    slug: "dracula",
-    theme: {
-      author: "termpaper",
-      description: "The Dracula scheme: purple and pink light over a dark grey night.",
-      effects: {
-        bloom: 0.5,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
+        "purple"
+      ],
       grade: {
-        tint: 0.10000000149011612,
-        vibrance: 0.30000001192092896
+        vibrance: 0.3,
+        tint: 0.1
       },
-      name: "Dracula",
       palette: {
+        mode: "tint",
         colors: [
           "#282a36",
           "#44475a",
@@ -2808,36 +2823,42 @@ var builtin_default = [
           "#ff79c6",
           "#f8f8f2"
         ],
-        mode: "tint",
-        strength: 0.6000000238418579
+        strength: 0.6
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.5
       },
       scene: {
         name: "shibuya",
         variant: "night"
-      },
+      }
+    }
+  },
+  {
+    slug: "everforest",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:LZDRboMwDEV_JXJfacVKV2hfp33FtAeTuBQNEuSYTlXFv8-GPeXqJr73OC-4JR5R4PpWQMSR4AqfD2J1KQsUgLPcE6srxOOEE7GagbLnfpI-Rb35SKM-F2wHch0TxX2LmYLbMpxPQ5o5F44wP12KTu7k6En5oEmCXYbr15reRxwsHPlHjzUJvk1gUKwXZJSZcSstDxcdplF5zCVzdAPpo66yV70UMOFAIuvomCxiuy7AiHit3R1D9V616u2qcGpOwVSNzaluTDWVLy9HU1j7silNhbb19W1VlT8jGmIWptjJ3SjO2pw9xbX3_0eZwm9KIevUA7lHg1Qmjn3sYFn-AA",
+    theme: {
+      format: 1,
+      name: "Everforest",
+      author: "termpaper",
+      description: "Comfortable green-based forest colours, easy on the eyes.",
       tags: [
         "terminal",
         "dark",
-        "purple"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:LZDRboMwDEV_JXJfacVKV2hfp33FtAeTuBQNEuSYTlXFv8-GPeXqJr73OC-4JR5R4PpWQMSR4AqfD2J1KQsUgLPcE6srxOOEE7GagbLnfpI-Rb35SKM-F2wHch0TxX2LmYLbMpxPQ5o5F44wP12KTu7k6En5oEmCXYbr15reRxwsHPlHjzUJvk1gUKwXZJSZcSstDxcdplF5zCVzdAPpo66yV70UMOFAIuvomCxiuy7AiHit3R1D9V616u2qcGpOwVSNzaluTDWVLy9HU1j7silNhbb19W1VlT8jGmIWptjJ3SjO2pw9xbX3_0eZwm9KIevUA7lHg1Qmjn3sYFn-AA",
-    shelf: "Terminal palettes",
-    slug: "everforest",
-    theme: {
-      author: "termpaper",
-      description: "Comfortable green-based forest colours, easy on the eyes.",
-      format: 1,
+        "green"
+      ],
       grade: {
-        saturation: 0.8999999761581421,
-        temperature: 0.10000000149011612,
-        tint: -0.10000000149011612
+        saturation: 0.9,
+        temperature: 0.1,
+        tint: -0.1
       },
-      name: "Everforest",
       palette: {
+        mode: "tint",
         colors: [
           "#2d353b",
           "#3d484d",
@@ -2847,41 +2868,35 @@ var builtin_default = [
           "#dbbc7f",
           "#d3c6aa"
         ],
-        mode: "tint",
-        strength: 0.6000000238418579
+        strength: 0.6
       },
       scene: {
         name: "redwoods",
         variant: "morning"
-      },
+      }
+    }
+  },
+  {
+    slug: "gruvbox",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:LZDBbsIwDIZfJQrXCpWOMugL7L7rtIObuCWiSSrHhSHUd59doRzyy_nt749fdsgUgW13qGyCiLazX7Tc-_xnKwsLXzNJiZHiDDOSFD0WR2HmkJO8fCNTNiPlfMfOPICiQSC-Pg2hL5V54jTlRzGQvLgQUzE5GQ90Mz3lR9rLRIax2O5no4QEk0LEIJfOs7-VHQm8RHtZlxMTFM27r1tpxSipgBeS53rftGtlZ5iQebPHrG2WQ2KZ5vKUaSPtmrMeqe3a-ng5tqqca44Hr8qfWl_jpj4vl-agqj_3fXNShb0XqbEKE6aRr4o-CRmHAR0XJRcGd1OURA_p_QcR4vwQZ3GYtoTvnQ-BcJ7AKfQOFEACd7r_JSa7rv8",
+    theme: {
+      format: 1,
+      name: "Gruvbox",
+      author: "termpaper",
+      description: "Retro groove: warm earthy reds, yellows and greens on dark brown.",
       tags: [
         "terminal",
         "dark",
-        "green"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:LZDBbsIwDIZfJQrXCpWOMugL7L7rtIObuCWiSSrHhSHUd59doRzyy_nt749fdsgUgW13qGyCiLazX7Tc-_xnKwsLXzNJiZHiDDOSFD0WR2HmkJO8fCNTNiPlfMfOPICiQSC-Pg2hL5V54jTlRzGQvLgQUzE5GQ90Mz3lR9rLRIax2O5no4QEk0LEIJfOs7-VHQm8RHtZlxMTFM27r1tpxSipgBeS53rftGtlZ5iQebPHrG2WQ2KZ5vKUaSPtmrMeqe3a-ng5tqqca44Hr8qfWl_jpj4vl-agqj_3fXNShb0XqbEKE6aRr4o-CRmHAR0XJRcGd1OURA_p_QcR4vwQZ3GYtoTvnQ-BcJ7AKfQOFEACd7r_JSa7rv8",
-    shelf: "Terminal palettes",
-    slug: "gruvbox",
-    theme: {
-      author: "termpaper",
-      description: "Retro groove: warm earthy reds, yellows and greens on dark brown.",
-      effects: {
-        grain: 0.30000001192092896,
-        stack: [
-          "grain"
-        ]
-      },
-      format: 1,
+        "warm"
+      ],
       grade: {
-        contrast: 1.0499999523162842,
+        contrast: 1.05,
         temperature: 0.25
       },
-      name: "Gruvbox",
       palette: {
+        mode: "tint",
         colors: [
           "#282828",
           "#504945",
@@ -2891,41 +2906,41 @@ var builtin_default = [
           "#b8bb26",
           "#ebdbb2"
         ],
-        mode: "tint",
-        strength: 0.6000000238418579
+        strength: 0.6
+      },
+      effects: {
+        stack: [
+          "grain"
+        ],
+        grain: 0.3
       },
       scene: {
         name: "fireplace",
         variant: "autumn"
-      },
+      }
+    }
+  },
+  {
+    slug: "kanagawa",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:LZC9bsMwDIRfRWCGLk6QP8eNX6BD1wIdig60RNlCbMmQ6GQI_O6hhEw6kaf7DnqCDXFChvZQgceJoIVv9NjjA6ECXHgIUWZMcZpxpihDQ0lHN7MLXjY_A6mvSMjqF-_0kZQOY1hiapXzN9WNC1Xq7sJIrNAbFUazLUHqMTimneQx9gnav8JwHseMwHiTQxLgv4I-opFiT3FM8hJ5iXLd7nf7ugJbdlmvFcwoHC7eKeQ5sPMsSblULJTNwR7s8VNmmyMe8dRkVZ_r88Vk1dBVm7K91o3tijLaNB3mJokj-Z6HDLwIj6wlzSnzEqO-ZYC0df5dW4Q4T-JMmnzp9f7kDqcuBEm_Y3QoHVso9nV9AQ",
+    theme: {
+      format: 1,
+      name: "Kanagawa",
+      author: "termpaper",
+      description: "The Great Wave's colours: ink blue, violet and old-paper white.",
       tags: [
         "terminal",
         "dark",
-        "warm"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:LZC9bsMwDIRfRWCGLk6QP8eNX6BD1wIdig60RNlCbMmQ6GQI_O6hhEw6kaf7DnqCDXFChvZQgceJoIVv9NjjA6ECXHgIUWZMcZpxpihDQ0lHN7MLXjY_A6mvSMjqF-_0kZQOY1hiapXzN9WNC1Xq7sJIrNAbFUazLUHqMTimneQx9gnav8JwHseMwHiTQxLgv4I-opFiT3FM8hJ5iXLd7nf7ugJbdlmvFcwoHC7eKeQ5sPMsSblULJTNwR7s8VNmmyMe8dRkVZ_r88Vk1dBVm7K91o3tijLaNB3mJokj-Z6HDLwIj6wlzSnzEqO-ZYC0df5dW4Q4T-JMmnzp9f7kDqcuBEm_Y3QoHVso9nV9AQ",
-    shelf: "Terminal palettes",
-    slug: "kanagawa",
-    theme: {
-      author: "termpaper",
-      description: "The Great Wave's colours: ink blue, violet and old-paper white.",
-      effects: {
-        grain: 0.30000001192092896,
-        stack: [
-          "grain"
-        ]
-      },
-      format: 1,
+        "ink"
+      ],
       grade: {
-        fade: 0.05000000074505806,
-        temperature: -0.05000000074505806
+        temperature: -0.05,
+        fade: 0.05
       },
-      name: "Kanagawa",
       palette: {
+        mode: "tint",
         colors: [
           "#1f1f28",
           "#2a2a37",
@@ -2934,36 +2949,42 @@ var builtin_default = [
           "#957fb8",
           "#dcd7ba"
         ],
-        mode: "tint",
-        strength: 0.6000000238418579
+        strength: 0.6
+      },
+      effects: {
+        stack: [
+          "grain"
+        ],
+        grain: 0.3
       },
       scene: {
         name: "bamboo",
         variant: "rain"
-      },
+      }
+    }
+  },
+  {
+    slug: "nord",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:LVDRboMwDPyVyH2liLZQMd72A_uBaQ9uYiAbJMgxm6aKf69D-5TL-ew73R36yDMKdKcCAs4EHXxEdlAArjJG1r8QzwsuxEo6Spb9Ij4GnbwHg2zF28KEyDIeb9Pq02gWnEiEOmNxmk3PMYnRESWDwRkb42QGpv9U6kXBIUH3ubv4gFM2Qf7RJ-vgq4CB0WmuOySUlfHpXZVto8s0a65Mq-BYlZcC-l1clVW9FfAKkpfnmHkQH2S_PUXefQ9nutR1pdzhcqvPzTmj2jbXK2bUUHtCm1Hb2srtOtc6oreMyFLf1zlkEqYwyJitr41aJ0thN3612n8_a_1F9qgZOvjTKFrqtj0A",
+    theme: {
+      format: 1,
+      name: "Nord",
+      author: "termpaper",
+      description: "An arctic, north-bluish palette: calm frost blues and cool greys.",
       tags: [
         "terminal",
         "dark",
-        "ink"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:LVDRboMwDPyVyH2liLZQMd72A_uBaQ9uYiAbJMgxm6aKf69D-5TL-ew73R36yDMKdKcCAs4EHXxEdlAArjJG1r8QzwsuxEo6Spb9Ij4GnbwHg2zF28KEyDIeb9Pq02gWnEiEOmNxmk3PMYnRESWDwRkb42QGpv9U6kXBIUH3ubv4gFM2Qf7RJ-vgq4CB0WmuOySUlfHpXZVto8s0a65Mq-BYlZcC-l1clVW9FfAKkpfnmHkQH2S_PUXefQ9nutR1pdzhcqvPzTmj2jbXK2bUUHtCm1Hb2srtOtc6oreMyFLf1zlkEqYwyJitr41aJ0thN3612n8_a_1F9qgZOvjTKFrqtj0A",
-    shelf: "Terminal palettes",
-    slug: "nord",
-    theme: {
-      author: "termpaper",
-      description: "An arctic, north-bluish palette: calm frost blues and cool greys.",
-      format: 1,
+        "cool"
+      ],
       grade: {
-        fade: 0.03999999910593033,
-        saturation: 0.8500000238418579,
-        temperature: -0.30000001192092896
+        saturation: 0.85,
+        temperature: -0.3,
+        fade: 0.04
       },
-      name: "Nord",
       palette: {
+        mode: "tint",
         colors: [
           "#2e3440",
           "#3b4252",
@@ -2973,34 +2994,33 @@ var builtin_default = [
           "#d8dee9",
           "#eceff4"
         ],
-        mode: "tint",
-        strength: 0.6499999761581421
+        strength: 0.65
       },
       scene: {
         name: "fjord",
         variant: "winter"
-      },
-      tags: [
-        "terminal",
-        "dark",
-        "cool"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:NZDNboMwEIRfxdpcUURICBHn3nvprephMQu26h-03gRFEe9eGzW30axn5pNfMEX2KNCfKgjoCXr4DKQ-kH-hAryLiZw9IfYLLsTZHClptovYGPLly5B6J1TShjz1Ssfo1Mz0TGq1YtTg7lSph42ORGEYFaoV2asnORfXYy4VnBP03_uQDejKTmH4qWBmHDPXC3QMwpgK7LFutwoWzH2y33wsb0BskBzV0UXe-w7NrdHnS_YOZ7pc2qaoVl_PXV3U9YQTTUXpa3cbx6Ko1XU3FIXD0AxTYUjCFGYx0NfHtkwnTWEf_v80j8GgCIaceyBbzBw9BDsbgW37Aw",
-    shelf: "Terminal palettes",
     slug: "one-dark",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:NZDNboMwEIRfxdpcUURICBHn3nvprephMQu26h-03gRFEe9eGzW30axn5pNfMEX2KNCfKgjoCXr4DKQ-kH-hAryLiZw9IfYLLsTZHClptovYGPLly5B6J1TShjz1Ssfo1Mz0TGq1YtTg7lSph42ORGEYFaoV2asnORfXYy4VnBP03_uQDejKTmH4qWBmHDPXC3QMwpgK7LFutwoWzH2y33wsb0BskBzV0UXe-w7NrdHnS_YOZ7pc2qaoVl_PXV3U9YQTTUXpa3cbx6Ko1XU3FIXD0AxTYUjCFGYx0NfHtkwnTWEf_v80j8GgCIaceyBbzBw9BDsbgW37Aw",
     theme: {
+      format: 1,
+      name: "One Dark",
       author: "termpaper",
       description: "The One Dark scheme: cool greys with blue, violet and a warm yellow.",
-      format: 1,
+      tags: [
+        "terminal",
+        "dark"
+      ],
       grade: {
-        contrast: 1.0499999523162842
+        contrast: 1.05
       },
-      name: "One Dark",
       palette: {
+        mode: "tint",
         colors: [
           "#282c34",
           "#3e4452",
@@ -3010,40 +3030,35 @@ var builtin_default = [
           "#e5c07b",
           "#abb2bf"
         ],
-        mode: "tint",
-        strength: 0.550000011920929
+        strength: 0.55
       },
       scene: {
         name: "manhattan",
         variant: "night"
-      },
-      tags: [
-        "terminal",
-        "dark"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:LVBBbsMwDPuKoV6DIkmDdMttPxh2HXZQHLk16tiBrBQbij5o79jHJqc9maBoktINXOIZBYamgogzwQAfKf_9mncfCSrAVc6JlRXiecGFWMmJsmW_iE9RJ28hmIiyMgaz6K_KOFy_jVvZYJwMmtGLSc7kdE7m6kfKg5lXoclwyrRpPPu8V2PBU4bhcwvzEUPJQr7oo8YX-KrgxDhpyRuIj9q63jdtBW7j6n3d31WJgUQ2zZwK_5BWYFNIvNnvmtfm2HbK7dq-PRywoJ56fOkLsh0e6VgQjaMdtynVE7muNMjCFE9yLoElj5wjK7nkZUF7KQFjSGku4gdQZafKbCluvZ6HDn5k5B-1vyJ7LPuA1XMEgvv9Hw",
-    shelf: "Terminal palettes",
     slug: "rose-pine",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:LVBBbsMwDPuKoV6DIkmDdMttPxh2HXZQHLk16tiBrBQbij5o79jHJqc9maBoktINXOIZBYamgogzwQAfKf_9mncfCSrAVc6JlRXiecGFWMmJsmW_iE9RJ28hmIiyMgaz6K_KOFy_jVvZYJwMmtGLSc7kdE7m6kfKg5lXoclwyrRpPPu8V2PBU4bhcwvzEUPJQr7oo8YX-KrgxDhpyRuIj9q63jdtBW7j6n3d31WJgUQ2zZwK_5BWYFNIvNnvmtfm2HbK7dq-PRywoJ56fOkLsh0e6VgQjaMdtynVE7muNMjCFE9yLoElj5wjK7nkZUF7KQFjSGku4gdQZafKbCluvZ6HDn5k5B-1vyJ7LPuA1XMEgvv9Hw",
     theme: {
+      format: 1,
+      name: "Ros\xE9 Pine",
       author: "termpaper",
       description: "All natural pine, faux fur and a bit of soho vibes: muted rose and iris.",
-      effects: {
-        bloom: 0.4000000059604645,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
+      tags: [
+        "terminal",
+        "dark",
+        "pink"
+      ],
       grade: {
-        fade: 0.05999999865889549,
-        tint: 0.11999999731779099
+        tint: 0.12,
+        fade: 0.06
       },
-      name: "Ros\xE9 Pine",
       palette: {
+        mode: "tint",
         colors: [
           "#191724",
           "#26233a",
@@ -3052,34 +3067,40 @@ var builtin_default = [
           "#ebbcba",
           "#e0def4"
         ],
-        mode: "tint",
-        strength: 0.6000000238418579
+        strength: 0.6
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.4
       },
       scene: {
         name: "library",
         variant: "candle"
-      },
+      }
+    }
+  },
+  {
+    slug: "solarized",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:TVBBboQwDPxK5L1GKxYKBc79QY9VDyYxEDUkKPFWalf8vQ7tobfReDwzmgfMMW3IMN40BNwIRniNHpP7Jgsa8M5rTEIypW3HnZKQlrJJbmcXw3-5esH0MSpLtCsm9GrCTFrtiYzLpCZ_p6yV-cKQFQarUC3RWwoKjaHAV3FmXDKMb2eaC-hLmJiWixjCu4YloZWSDzAxcMIszavr0B4advTEfN62WDTALrC8muhjOm0vVVVPTSfcpXpuuqe6oLrrJ_uLEG9DX9DU9kNVFUREvW0Lmu3cUVM6ZE4UFl5LdFuis_Q_g_8W9LhE2UbDpyyDUmKE4JaV4Th-AA",
+    theme: {
+      format: 1,
+      name: "Solarized",
+      author: "termpaper",
+      description: "Solarized Dark: deep teal base, precise blues, cyans and a golden accent.",
       tags: [
         "terminal",
         "dark",
-        "pink"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:TVBBboQwDPxK5L1GKxYKBc79QY9VDyYxEDUkKPFWalf8vQ7tobfReDwzmgfMMW3IMN40BNwIRniNHpP7Jgsa8M5rTEIypW3HnZKQlrJJbmcXw3-5esH0MSpLtCsm9GrCTFrtiYzLpCZ_p6yV-cKQFQarUC3RWwoKjaHAV3FmXDKMb2eaC-hLmJiWixjCu4YloZWSDzAxcMIszavr0B4advTEfN62WDTALrC8muhjOm0vVVVPTSfcpXpuuqe6oLrrJ_uLEG9DX9DU9kNVFUREvW0Lmu3cUVM6ZE4UFl5LdFuis_Q_g_8W9LhE2UbDpyyDUmKE4JaV4Th-AA",
-    shelf: "Terminal palettes",
-    slug: "solarized",
-    theme: {
-      author: "termpaper",
-      description: "Solarized Dark: deep teal base, precise blues, cyans and a golden accent.",
-      format: 1,
+        "teal"
+      ],
       grade: {
-        contrast: 0.949999988079071
+        contrast: 0.95
       },
-      name: "Solarized",
       palette: {
+        mode: "tint",
         colors: [
           "#002b36",
           "#073642",
@@ -3089,46 +3110,40 @@ var builtin_default = [
           "#eee8d5",
           "#fdf6e3"
         ],
-        mode: "tint",
-        strength: 0.550000011920929
+        strength: 0.55
       },
       scene: {
         name: "lagoon",
         variant: "night"
-      },
+      }
+    }
+  },
+  {
+    slug: "tokyo-night",
+    shelf: "Terminal palettes",
+    yours: false,
+    code: "tp1:TVG7boRADPyVla8lCLgXocsPpEoXpTCLgdXBLloM0enEv8fmrkjFaHY8MzYPaEMckaHKE_A4ElTwFW73YD5d1zMkgAv3IQrNFMcJJ4pCNjTb6CZ2wcvLh7-b2ZIn47zhnsw_BzPhQMxUmYZoMh5X0fbYhN85MfWwkEHfmNUFUZlBJ1LxZ-xmqL73TOdx0EiMN_noCPwk0EVspOwDbPAccdYN0qxMYHV1RG_lLUuLs1jRKJ2RlyjUW5bmwr0K6HgvdlVxzNJMVh3D4nkf3LYEXs1VNQYNA3ZeT2LDEOLe75BjXhcX4Q7FqSiPtaJTfiovpaIrYtFeFdX1Oz6RzSy2Z11h5ki-414DL2cJpLYly3utmdHeNKEeQhhV_QQqFeV-bdW9fhnrwcV9xehQV4CIzsO2_QE",
+    theme: {
+      format: 1,
+      name: "Tokyo Night",
+      author: "termpaper",
+      description: "Any scene in the Tokyo Night palette: deep navy shadows, blue and violet light.",
       tags: [
         "terminal",
         "dark",
-        "teal"
-      ]
-    },
-    yours: false
-  },
-  {
-    code: "tp1:TVG7boRADPyVla8lCLgXocsPpEoXpTCLgdXBLloM0enEv8fmrkjFaHY8MzYPaEMckaHKE_A4ElTwFW73YD5d1zMkgAv3IQrNFMcJJ4pCNjTb6CZ2wcvLh7-b2ZIn47zhnsw_BzPhQMxUmYZoMh5X0fbYhN85MfWwkEHfmNUFUZlBJ1LxZ-xmqL73TOdx0EiMN_noCPwk0EVspOwDbPAccdYN0qxMYHV1RG_lLUuLs1jRKJ2RlyjUW5bmwr0K6HgvdlVxzNJMVh3D4nkf3LYEXs1VNQYNA3ZeT2LDEOLe75BjXhcX4Q7FqSiPtaJTfiovpaIrYtFeFdX1Oz6RzSy2Z11h5ki-414DL2cJpLYly3utmdHeNKEeQhhV_QQqFeV-bdW9fhnrwcV9xehQV4CIzsO2_QE",
-    shelf: "Terminal palettes",
-    slug: "tokyo-night",
-    theme: {
-      author: "termpaper",
-      description: "Any scene in the Tokyo Night palette: deep navy shadows, blue and violet light.",
-      effects: {
-        bloom: 0.6000000238418579,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
+        "blue"
+      ],
       grade: {
-        contrast: 1.0800000429153442,
+        contrast: 1.08,
+        vibrance: 0.25,
+        temperature: -0.15,
         shadows: {
-          amount: 0.20000000298023224,
-          hue: 230
-        },
-        temperature: -0.15000000596046448,
-        vibrance: 0.25
+          hue: 230,
+          amount: 0.2
+        }
       },
-      name: "Tokyo Night",
       palette: {
+        mode: "tint",
         colors: [
           "#1a1b26",
           "#24283b",
@@ -3137,156 +3152,153 @@ var builtin_default = [
           "#bb9af7",
           "#c0caf5"
         ],
-        mode: "tint",
-        strength: 0.6499999761581421
+        strength: 0.65
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.6
       },
       scene: {
         name: "tokyo",
         variant: "rain"
-      },
-      tags: [
-        "terminal",
-        "dark",
-        "blue"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:NVDBasMwDP0Vo15DSelGSm5jfzB2Gz0ojpKYxZaRvZZR8u-TnfVg_Cy99yy9B0wsHjP0pwYCeoIe3vxAYt4_PqEB_MkLixYziY8YSbQ4UrLiYnYcCj0YrArPge0i7KlAl1l6QzeSX5MsBTIumHnluwuzYcEwk4kLJz1yVNOMc4L-C4SysL6Lm153FA_XBiKulLOO99DOWMb0GLVveWWpwsMJ26lttXZ4tefzjmzXdTuapqF9ovHl0sJ1a4CmiWxOxTVltN_Fx0pW1rAy14930LfHS1NbBamyrlR0_6ElDliyuaE4DEqDGgps2x8",
-    shelf: "Retro",
     slug: "amber-crt",
+    shelf: "Retro",
+    yours: false,
+    code: "tp1:NVDBasMwDP0Vo15DSelGSm5jfzB2Gz0ojpKYxZaRvZZR8u-TnfVg_Cy99yy9B0wsHjP0pwYCeoIe3vxAYt4_PqEB_MkLixYziY8YSbQ4UrLiYnYcCj0YrArPge0i7KlAl1l6QzeSX5MsBTIumHnluwuzYcEwk4kLJz1yVNOMc4L-C4SysL6Lm153FA_XBiKulLOO99DOWMb0GLVveWWpwsMJ26lttXZ4tefzjmzXdTuapqF9ovHl0sJ1a4CmiWxOxTVltN_Fx0pW1rAy14930LfHS1NbBamyrlR0_6ElDliyuaE4DEqDGgps2x8",
     theme: {
-      author: "termpaper",
-      description: "An amber monochrome monitor: every scene in glowing orange phosphor.",
-      effects: {
-        bloom: 0.800000011920929,
-        crt: 0.800000011920929,
-        stack: [
-          "crt",
-          "bloom"
-        ]
-      },
       format: 1,
       name: "Amber CRT",
+      author: "termpaper",
+      description: "An amber monochrome monitor: every scene in glowing orange phosphor.",
+      tags: [
+        "retro",
+        "mono",
+        "warm"
+      ],
       palette: {
+        mode: "map",
         colors: [
           "#1a0f00",
           "#5c3300",
           "#c77700",
           "#ffb000",
           "#ffd480"
+        ]
+      },
+      effects: {
+        stack: [
+          "crt",
+          "bloom"
         ],
-        mode: "map"
+        bloom: 0.8,
+        crt: 0.8
       },
       scene: {
         name: "sonar",
         variant: "amber"
-      },
-      tags: [
-        "retro",
-        "mono",
-        "warm"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:NZDBbsMgDIZfBbnXqEpXbUpy3GF7iGkHB0xBIYDAkVZVefeZdDvx89n-_csPsKmsyDBdOoi4EkzwKY96T3foADd2qQhjKmvGTEWgoaqLz-xTlMpH2oqqDoWqZFUmVLdCFDtlPDsqZBRGo7Tb4nLvVPALKeHqMg6jclJyFMxZbBlvFaYvKMQlyf9wge8OMgZilmQPWJNpCWvELB06hVSOmVNvr0NvhZ2u_dvLtW9qmFE_2TjPTYnXMxNMXDbaOyBrSXNt1pVRL80r-x8KKPva6n899edX6a-a4hHk71TBW4J9_wU",
-    shelf: "Retro",
     slug: "game-boy",
+    shelf: "Retro",
+    yours: false,
+    code: "tp1:NZDBbsMgDIZfBbnXqEpXbUpy3GF7iGkHB0xBIYDAkVZVefeZdDvx89n-_csPsKmsyDBdOoi4EkzwKY96T3foADd2qQhjKmvGTEWgoaqLz-xTlMpH2oqqDoWqZFUmVLdCFDtlPDsqZBRGo7Tb4nLvVPALKeHqMg6jclJyFMxZbBlvFaYvKMQlyf9wge8OMgZilmQPWJNpCWvELB06hVSOmVNvr0NvhZ2u_dvLtW9qmFE_2TjPTYnXMxNMXDbaOyBrSXNt1pVRL80r-x8KKPva6n899edX6a-a4hHk71TBW4J9_wU",
     theme: {
-      author: "termpaper",
-      description: "Four shades of pea green, dithered and chunky, like the 1989 handheld.",
-      effects: {
-        pixelate: 0.5,
-        stack: [
-          "pixelate"
-        ]
-      },
       format: 1,
       name: "Game Boy",
+      author: "termpaper",
+      description: "Four shades of pea green, dithered and chunky, like the 1989 handheld.",
+      tags: [
+        "retro",
+        "green"
+      ],
       palette: {
+        mode: "snap",
         colors: [
           "#0f380f",
           "#306230",
           "#8bac0f",
           "#9bbc0f"
         ],
-        dither: true,
-        mode: "snap"
+        dither: true
+      },
+      effects: {
+        stack: [
+          "pixelate"
+        ],
+        pixelate: 0.5
       },
       scene: {
         name: "life"
-      },
-      tags: [
-        "retro",
-        "green"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TVCxTsQwDP2VyKzl1LuiCnVjYmVHN_hSp41I4igJMJz679hVQUx5fn5-efYdHJeIDaZzBwkjwQSvhSiZt5VrXrlAB_jZFEzQqMSMmZScqdric_OcpPNiFp16FE6HVegThslUiyn4RLUzS-Bvg2k2aGrwy9qMKz4tdBK3hkuF6R0KtcJSR0767KZw7SBjoNYk3V1as6aMmEVgOXDZJx_6_ox9L5ygp_kXIV4uiobBuXFUdBNkR7huHZBzZFtV19rQfqjPX2DR3gJz1F_WwhE1x4Gm_jR0_6RSP29KUNozHpesnFBv9YXFY5IjHwtt2w8",
-    shelf: "Retro",
     slug: "green-phosphor",
+    shelf: "Retro",
+    yours: false,
+    code: "tp1:TVCxTsQwDP2VyKzl1LuiCnVjYmVHN_hSp41I4igJMJz679hVQUx5fn5-efYdHJeIDaZzBwkjwQSvhSiZt5VrXrlAB_jZFEzQqMSMmZScqdric_OcpPNiFp16FE6HVegThslUiyn4RLUzS-Bvg2k2aGrwy9qMKz4tdBK3hkuF6R0KtcJSR0767KZw7SBjoNYk3V1as6aMmEVgOXDZJx_6_ox9L5ygp_kXIV4uiobBuXFUdBNkR7huHZBzZFtV19rQfqjPX2DR3gJz1F_WwhE1x4Gm_jR0_6RSP29KUNozHpesnFBv9YXFY5IjHwtt2w8",
     theme: {
-      author: "termpaper",
-      description: "A green-screen terminal: scanlines, glow and a slight fringe.",
-      effects: {
-        chroma: 0.30000001192092896,
-        scanlines: 0.800000011920929,
-        stack: [
-          "scanlines",
-          "bloom",
-          "chroma"
-        ]
-      },
       format: 1,
       name: "Green Phosphor",
+      author: "termpaper",
+      description: "A green-screen terminal: scanlines, glow and a slight fringe.",
+      tags: [
+        "retro",
+        "mono",
+        "green"
+      ],
       palette: {
+        mode: "map",
         colors: [
           "#001a00",
           "#004d00",
           "#00aa22",
           "#33ff66",
           "#b3ffc6"
+        ]
+      },
+      effects: {
+        stack: [
+          "scanlines",
+          "bloom",
+          "chroma"
         ],
-        mode: "map"
+        chroma: 0.3,
+        scanlines: 0.8
       },
       scene: {
         name: "sonar",
         variant: "green"
-      },
-      tags: [
-        "retro",
-        "mono",
-        "green"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TVBBboQwDPxK5L2iFVBALZ_ooceqBwMOoEISOWZRteLvdaCH3iYzGc_YT7CeVxRoiwwcrgQtfPw4mXZ8EGSAm0yelRTiNWAgVnKg2PMcZPZOlfdNeHMmbi6SmN4vfuNo9lkmgyYKezcaR96ZcfH7Xe2CY4T2E5hU1HcS4SuDkXHQ_Cf03gljTKXuxZFBwIVETmn16QusGNSYsvgcdSvKPC8r5W5ll9v6RNgVtqkTsrayzduFXm3dXIheGkq52pHcKBO0-b3ROFKpl5jiomD_nQK6xftVbRMueO6tvovTjuU_XmdUOiP25M7CfzcdeR7U_kCe0eliioLe9Th-AQ",
-    shelf: "Retro",
     slug: "synthwave",
+    shelf: "Retro",
+    yours: false,
+    code: "tp1:TVBBboQwDPxK5L2iFVBALZ_ooceqBwMOoEISOWZRteLvdaCH3iYzGc_YT7CeVxRoiwwcrgQtfPw4mXZ8EGSAm0yelRTiNWAgVnKg2PMcZPZOlfdNeHMmbi6SmN4vfuNo9lkmgyYKezcaR96ZcfH7Xe2CY4T2E5hU1HcS4SuDkXHQ_Cf03gljTKXuxZFBwIVETmn16QusGNSYsvgcdSvKPC8r5W5ll9v6RNgVtqkTsrayzduFXm3dXIheGkq52pHcKBO0-b3ROFKpl5jiomD_nQK6xftVbRMueO6tvovTjuU_XmdUOiP25M7CfzcdeR7U_kCe0eliioLe9Th-AQ",
     theme: {
+      format: 1,
+      name: "Synthwave",
       author: "termpaper",
       description: "Outrun sunset colours with a strong neon glow.",
-      effects: {
-        bloom: 1.2000000476837158,
-        halation: 0.4000000059604645,
-        stack: [
-          "bloom",
-          "halation"
-        ]
-      },
-      format: 1,
+      tags: [
+        "retro",
+        "neon"
+      ],
       grade: {
-        contrast: 1.100000023841858
+        contrast: 1.1
       },
-      name: "Synthwave",
       palette: {
+        mode: "map",
         colors: [
           "#120024",
           "#2b0f54",
@@ -3295,41 +3307,42 @@ var builtin_default = [
           "#ff8f56",
           "#ffe36e"
         ],
-        mode: "map",
-        strength: 0.6000000238418579
+        strength: 0.6
+      },
+      effects: {
+        stack: [
+          "bloom",
+          "halation"
+        ],
+        bloom: 1.2,
+        halation: 0.4
       },
       scene: {
         name: "grid",
         variant: "vapor"
-      },
-      tags: [
-        "retro",
-        "neon"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TVDNasMwDH6VoF5DcenWQd5h113GDpotJ6aJHGQ1Y5S8--Q0jIIP8vf5-7HuELNMqNCdWmCcCDr4wDnLDy4ELeBNhywGKsk040xiYKDiJc2aMhvzjj2xYoMcGv-L3AQhnErblBy1KR55TEzlwecx36SJkri3czQzxb5A9wlCKtnuTObawpz4Cl8t9ILBSt1hSd-C7G12x5fVHuBIqhs15foENLGasmbIZnk4oXPns2GHc3DucqlTjM6hq5Nz9BrjAwun6GpcUSHudagpb5ZCMZLXUlOKor9WWz9IntB0_3-ryh013eWZ2dsWT7x13XfcSwrmsKAktNadTbZ0WNc_",
-    shelf: "Retro",
     slug: "vaporwave",
+    shelf: "Retro",
+    yours: false,
+    code: "tp1:TVDNasMwDH6VoF5DcenWQd5h113GDpotJ6aJHGQ1Y5S8--Q0jIIP8vf5-7HuELNMqNCdWmCcCDr4wDnLDy4ELeBNhywGKsk040xiYKDiJc2aMhvzjj2xYoMcGv-L3AQhnErblBy1KR55TEzlwecx36SJkri3czQzxb5A9wlCKtnuTObawpz4Cl8t9ILBSt1hSd-C7G12x5fVHuBIqhs15foENLGasmbIZnk4oXPns2GHc3DucqlTjM6hq5Nz9BrjAwun6GpcUSHudagpb5ZCMZLXUlOKor9WWz9IntB0_3-ryh013eWZ2dsWT7x13XfcSwrmsKAktNadTbZ0WNc_",
     theme: {
+      format: 1,
+      name: "Vaporwave",
       author: "termpaper",
       description: "Magenta and cyan dreams, soft scanlines and colour fringing.",
-      effects: {
-        chroma: 0.6000000238418579,
-        scanlines: 0.4000000059604645,
-        stack: [
-          "chroma",
-          "scanlines"
-        ]
-      },
-      format: 1,
+      tags: [
+        "retro",
+        "neon",
+        "pink"
+      ],
       grade: {
-        vibrance: 0.4000000059604645
+        vibrance: 0.4
       },
-      name: "Vaporwave",
       palette: {
+        mode: "tint",
         colors: [
           "#1a0033",
           "#3d0066",
@@ -3337,40 +3350,47 @@ var builtin_default = [
           "#00e5ff",
           "#ffd1f0"
         ],
-        mode: "tint",
-        strength: 0.699999988079071
+        strength: 0.7
+      },
+      effects: {
+        stack: [
+          "chroma",
+          "scanlines"
+        ],
+        chroma: 0.6,
+        scanlines: 0.4
       },
       scene: {
         name: "grid",
         variant: "vapor"
-      },
-      tags: [
-        "retro",
-        "neon",
-        "pink"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:LZBLTsUwDEW3UplpeGrfh09nDFkDYuAmThspn8pxEeipe8cpzOx7bZ-b3MEXTigwDgYyJoIR3thKsGAAN1kKqyLEacWVWEVH1XJYJZSszrulLoZ5kbGzJbpuihuZbuImdZhdZyNhPume4Fxh_IBUitPWlhLh08DM6BR6h4qyMf6d7U_PNwP0vZa6MbV-0F4oaYQ2ptKjzhhYlHPgazuxbGqc-_7Ua_ZUtixt9bzvBlaMJHKAUmlAkKB2yxELH8Ee-mm4nHvVHgZ7cTds1dW_eHto-Oqe_K1VvvfofQtfhSnPsjTMVSnVUj4Y_z8ZLE3E-m4DX8gBWyBw-AP7_gs",
-    shelf: "Mood",
     slug: "arctic",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:LZBLTsUwDEW3UplpeGrfh09nDFkDYuAmThspn8pxEeipe8cpzOx7bZ-b3MEXTigwDgYyJoIR3thKsGAAN1kKqyLEacWVWEVH1XJYJZSszrulLoZ5kbGzJbpuihuZbuImdZhdZyNhPume4Fxh_IBUitPWlhLh08DM6BR6h4qyMf6d7U_PNwP0vZa6MbV-0F4oaYQ2ptKjzhhYlHPgazuxbGqc-_7Ua_ZUtixt9bzvBlaMJHKAUmlAkKB2yxELH8Ee-mm4nHvVHgZ7cTds1dW_eHto-Oqe_K1VvvfofQtfhSnPsjTMVSnVUj4Y_z8ZLE3E-m4DX8gBWyBw-AP7_gs",
     theme: {
+      format: 1,
+      name: "Arctic",
       author: "termpaper",
       description: "Ice light: cold blue, bright and clean.",
-      format: 1,
+      tags: [
+        "mood",
+        "cool"
+      ],
       grade: {
-        exposure: 0.15000000596046448,
-        highlights: {
-          amount: 0.20000000298023224,
-          hue: 200
-        },
         saturation: 0.75,
-        temperature: -0.699999988079071
+        exposure: 0.15,
+        temperature: -0.7,
+        highlights: {
+          hue: 200,
+          amount: 0.2
+        }
       },
-      name: "Arctic",
       palette: {
+        mode: "tint",
         colors: [
           "#0b1320",
           "#1c3d5a",
@@ -3378,42 +3398,34 @@ var builtin_default = [
           "#a9d6f5",
           "#f0faff"
         ],
-        mode: "tint",
-        strength: 0.4000000059604645
+        strength: 0.4
       },
       scene: {
         name: "icebergs",
         variant: "day"
-      },
-      tags: [
-        "mood",
-        "cool"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:PVDLboMwEPwVa3NFEVBCE6699weqHhZjwApeo_UmFYry713Tx20843loHzBGDijQVQUQBgcdvG294_VGVygAbzJHVlIchxVXx0oOLln2q_hIqrz7aRZjvWyGXKTOzFHM6ulqkAZjN6TCzMgKIwljksJMS_zyNJnkJ0pHTRScEnQfEGIc9Jlz4LOAiXHQRQ_4s-rMY3Uq4O57RrKqlcfmWcCKixPZv4aYLSCeRJNsXCLv0YdyKOu6Uu5Qt1XTvGY0tmV1GXY0vpzbZlcHV7t25y72XLo8JAk7mmTOfaeTFrpxdFZSLkyC9pob-iXGkDtnjgGz7YfRzfU_qwGt-pN1tM_9vXmafX_bUN13ZI-6vQNGT_B8fgM",
-    shelf: "Mood",
     slug: "cyberpunk",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:PVDLboMwEPwVa3NFEVBCE6699weqHhZjwApeo_UmFYry713Tx20843loHzBGDijQVQUQBgcdvG294_VGVygAbzJHVlIchxVXx0oOLln2q_hIqrz7aRZjvWyGXKTOzFHM6ulqkAZjN6TCzMgKIwljksJMS_zyNJnkJ0pHTRScEnQfEGIc9Jlz4LOAiXHQRQ_4s-rMY3Uq4O57RrKqlcfmWcCKixPZv4aYLSCeRJNsXCLv0YdyKOu6Uu5Qt1XTvGY0tmV1GXY0vpzbZlcHV7t25y72XLo8JAk7mmTOfaeTFrpxdFZSLkyC9pob-iXGkDtnjgGz7YfRzfU_qwGt-pN1tM_9vXmafX_bUN13ZI-6vQNGT_B8fgM",
     theme: {
+      format: 1,
+      name: "Cyberpunk",
       author: "termpaper",
       description: "Night city neon: hot pink and cyan, hard contrast, glowing signs.",
-      effects: {
-        bloom: 1.2000000476837158,
-        chroma: 0.6000000238418579,
-        stack: [
-          "bloom",
-          "chroma"
-        ]
-      },
-      format: 1,
+      tags: [
+        "mood",
+        "neon"
+      ],
       grade: {
-        contrast: 1.149999976158142,
-        vibrance: 0.4000000059604645
+        contrast: 1.15,
+        vibrance: 0.4
       },
-      name: "Cyberpunk",
       palette: {
+        mode: "tint",
         colors: [
           "#0d0221",
           "#261447",
@@ -3422,72 +3434,80 @@ var builtin_default = [
           "#2de2e6",
           "#f9c80e"
         ],
-        mode: "tint",
-        strength: 0.550000011920929
+        strength: 0.55
+      },
+      effects: {
+        stack: [
+          "bloom",
+          "chroma"
+        ],
+        bloom: 1.2,
+        chroma: 0.6
       },
       scene: {
         name: "shibuya",
         variant: "rain"
-      },
-      tags: [
-        "mood",
-        "neon"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:TVBBTsQwDPxK5HNUbSUWUO_wCcTBJG4SbZNUjksPq_4dp6wQt2RmPDP2HebKGQWm0ULBTDDBW_4iBgu4SaysgBDnFdcT9NQcp1VSLcq8J6YlhSiT8USr2ZGzaRF93Zs1Yal7KsFEVZyqZrB4g8Yj38zMGjeopWBoMH1ArtXrt3vAp4XA6LXOHVwtwth6x2G8qp6ydkHZWOnL8KJIKtKfusMjvM_FTfnxOlx0lVy3X8nTcVigeSYnp6gJultPj7jguZWF7xQKiVBv8Qfr7Os_Sr_P6tQclbPk43azHmRd0FG3QU7YU6GVusNx_AA",
-    shelf: "Mood",
     slug: "ember",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:TVBBTsQwDPxK5HNUbSUWUO_wCcTBJG4SbZNUjksPq_4dp6wQt2RmPDP2HebKGQWm0ULBTDDBW_4iBgu4SaysgBDnFdcT9NQcp1VSLcq8J6YlhSiT8USr2ZGzaRF93Zs1Yal7KsFEVZyqZrB4g8Yj38zMGjeopWBoMH1ArtXrt3vAp4XA6LXOHVwtwth6x2G8qp6ydkHZWOnL8KJIKtKfusMjvM_FTfnxOlx0lVy3X8nTcVigeSYnp6gJultPj7jguZWF7xQKiVBv8Qfr7Os_Sr_P6tQclbPk43azHmRd0FG3QU7YU6GVusNx_AA",
     theme: {
+      format: 1,
+      name: "Ember",
       author: "termpaper",
       description: "Firelight: deep warm shadows, glowing highlights and a dark frame.",
+      tags: [
+        "mood",
+        "warm"
+      ],
+      grade: {
+        contrast: 1.15,
+        temperature: 0.7,
+        tint: 0.1,
+        shadows: {
+          hue: 15,
+          amount: 0.4
+        }
+      },
       effects: {
-        halation: 0.800000011920929,
         stack: [
           "halation",
           "vignette"
         ],
-        vignette: 0.6000000238418579
+        halation: 0.8,
+        vignette: 0.6
       },
-      format: 1,
-      grade: {
-        contrast: 1.149999976158142,
-        shadows: {
-          amount: 0.4000000059604645,
-          hue: 15
-        },
-        temperature: 0.699999988079071,
-        tint: 0.10000000149011612
-      },
-      name: "Ember",
       scene: {
         name: "fireplace",
         variant: "snow"
-      },
-      tags: [
-        "mood",
-        "warm"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:LZDNcoMwDIRfhVGulIFA0pZzpy_R6UFgAZ7BP5WV5JDh3Su7vX1aa71rP2EJ7FBg7Grw6AhG-AxMSaAGvMkWWBUhdhEjsYqG0sw2ig1eTz6IYvUIwaSxciGlamUin-rq52ZJqrShCQ8dDca4k6l2u27S6DWCa4LxC5x6dSw2-M6ARks84W4nRj8rt81Z963Xki-Fl7LSNu1w1BBxJ5FicSHrf6s1zGEPXDJO7dRhu6h26qjH85CpX65Tj5neJrxeCtFAr9N7rpGEya-y5ZiLpqSZfMn4_yMmU16trjuyxVxO89lbv8Jx_AI",
-    shelf: "Mood",
     slug: "forest",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:LZDNcoMwDIRfhVGulIFA0pZzpy_R6UFgAZ7BP5WV5JDh3Su7vX1aa71rP2EJ7FBg7Grw6AhG-AxMSaAGvMkWWBUhdhEjsYqG0sw2ig1eTz6IYvUIwaSxciGlamUin-rq52ZJqrShCQ8dDca4k6l2u27S6DWCa4LxC5x6dSw2-M6ARks84W4nRj8rt81Z963Xki-Fl7LSNu1w1BBxJ5FicSHrf6s1zGEPXDJO7dRhu6h26qjH85CpX65Tj5neJrxeCtFAr9N7rpGEya-y5ZiLpqSZfMn4_yMmU16trjuyxVxO89lbv8Jx_AI",
     theme: {
+      format: 1,
+      name: "Forest",
       author: "termpaper",
       description: "Deep woods: moss greens, quiet shadows, dappled light.",
-      format: 1,
+      tags: [
+        "mood",
+        "green"
+      ],
       grade: {
-        fade: 0.03999999910593033,
-        tint: -0.20000000298023224,
-        vibrance: 0.20000000298023224
+        vibrance: 0.2,
+        tint: -0.2,
+        fade: 0.04
       },
-      name: "Forest",
       palette: {
+        mode: "tint",
         colors: [
           "#0b1a0f",
           "#1e3a24",
@@ -3495,34 +3515,35 @@ var builtin_default = [
           "#8ba65a",
           "#e4e7b9"
         ],
-        mode: "tint",
         strength: 0.5
       },
       scene: {
         name: "redwoods",
         variant: "morning"
-      },
-      tags: [
-        "mood",
-        "green"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:LVC7boRADPwV5GsJghB0hJ9IlSpKYXYNrLIPYsylOPHv8XLXjccznpHvMCUOKDA0JUQMBAN8GMIIJeAuS2IlhDisuBIraWkz7FZxKermM1riP1RB4d28yFAIoS8w2gJ_dywLk9JjNJ6QKz0gOG8wfEFIyeqYBZlVG3yXMDNa7XCHmxsZo1FcV69dFgQtgLKzUi911XZHCSt6Ejn1IWUfiItyXvWJz5hL3TZ1Y5S71GP73r2dqL9SP2Z0nUxv-4zsNLVTnztswhRnWXJ0l2M2Q_EMeT7oh_yqlhuyQ40bYNujdwLH8Q8",
-    shelf: "Mood",
     slug: "ocean",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:LVC7boRADPwV5GsJghB0hJ9IlSpKYXYNrLIPYsylOPHv8XLXjccznpHvMCUOKDA0JUQMBAN8GMIIJeAuS2IlhDisuBIraWkz7FZxKermM1riP1RB4d28yFAIoS8w2gJ_dywLk9JjNJ6QKz0gOG8wfEFIyeqYBZlVG3yXMDNa7XCHmxsZo1FcV69dFgQtgLKzUi911XZHCSt6Ejn1IWUfiItyXvWJz5hL3TZ1Y5S71GP73r2dqL9SP2Z0nUxv-4zsNLVTnztswhRnWXJ0l2M2Q_EMeT7oh_yqlhuyQ40bYNujdwLH8Q8",
     theme: {
+      format: 1,
+      name: "Ocean",
       author: "termpaper",
       description: "Underwater light: teal and aqua, cool and clear.",
-      format: 1,
+      tags: [
+        "mood",
+        "cool",
+        "teal"
+      ],
       grade: {
-        temperature: -0.3499999940395355,
-        vibrance: 0.25
+        vibrance: 0.25,
+        temperature: -0.35
       },
-      name: "Ocean",
       palette: {
+        mode: "tint",
         colors: [
           "#03101c",
           "#0b3954",
@@ -3530,42 +3551,36 @@ var builtin_default = [
           "#7fc8d8",
           "#dff3f8"
         ],
-        mode: "tint",
-        strength: 0.550000011920929
+        strength: 0.55
       },
       scene: {
         name: "kelp",
         variant: "sunlit"
-      },
-      tags: [
-        "mood",
-        "cool",
-        "teal"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:LZDBbsMgEER_BW2uVpRYSZP43A-o1GPVwxoW26oBa1k3raL8exfcE7vDMPPEA3zigALdsYGIgaCDN8xCs3llwgAN4CpjYtWFOCy4EKvoKFueFplS1Jv35KUxOPGvwejMPA2jdGbBmYxNc1o5Nyp6IWfyiC7ddUczUBR1DHO67zVScMjQfUBIyelaQ_RcKg18NjAwOuV7QEZZGbfuw_7SAP0sKa9MZW3PDfhqPOyP7bMEzCRSH4ZUdJApluSCxrVy1_atO7Wq7a7udkMqk_f9GS91su5sN-1KjvoCk4UpDjKWmpO2kPdkJVc8QftVYvs5pVDM26DOF3VmS7HS_H-31Q9ymVDzv5EnVLYO8hp5ygTP5x8",
-    shelf: "Mood",
     slug: "pastel-dream",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:LZDBbsMgEER_BW2uVpRYSZP43A-o1GPVwxoW26oBa1k3raL8exfcE7vDMPPEA3zigALdsYGIgaCDN8xCs3llwgAN4CpjYtWFOCy4EKvoKFueFplS1Jv35KUxOPGvwejMPA2jdGbBmYxNc1o5Nyp6IWfyiC7ddUczUBR1DHO67zVScMjQfUBIyelaQ_RcKg18NjAwOuV7QEZZGbfuw_7SAP0sKa9MZW3PDfhqPOyP7bMEzCRSH4ZUdJApluSCxrVy1_atO7Wq7a7udkMqk_f9GS91su5sN-1KjvoCk4UpDjKWmpO2kPdkJVc8QftVYvs5pVDM26DOF3VmS7HS_H-31Q9ymVDzv5EnVLYO8hp5ygTP5x8",
     theme: {
+      format: 1,
+      name: "Pastel Dream",
       author: "termpaper",
       description: "Soft, airy and light: pale colours, lifted shadows, a gentle glow.",
-      effects: {
-        bloom: 0.6000000238418579,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
+      tags: [
+        "mood",
+        "light",
+        "pastel"
+      ],
       grade: {
+        saturation: 0.7,
         exposure: 0.25,
-        fade: 0.11999999731779099,
-        saturation: 0.699999988079071
+        fade: 0.12
       },
-      name: "Pastel Dream",
       palette: {
+        mode: "tint",
         colors: [
           "#2b2d42",
           "#8d99ae",
@@ -3573,77 +3588,76 @@ var builtin_default = [
           "#fcd5ce",
           "#f8edeb"
         ],
-        mode: "tint",
-        strength: 0.4000000059604645
+        strength: 0.4
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.6
       },
       scene: {
         name: "cloudsea",
         variant: "sunrise"
-      },
-      tags: [
-        "mood",
-        "light",
-        "pastel"
-      ]
-    },
-    yours: false
+      }
+    }
   },
   {
-    code: "tp1:RVBBboQwDPxK5HOKaNFWKtc-oceqBwOBRJAYOaYSWvH3dWClPURxPDOece4wEkcUaN8tJIwOWvjBeWMEC7iJJ9aOOI4rro61Objcc1glUFLk2zvm_a1bKGeKZg1pbk2mUQxT3o0Pk1_0SLZmckkWZzAN5mxVOkxwytD-QiQa9Fnkep0w_FmYGAdNdIeMopEuz7r6UmFIUsoPC-PJqav608LLr6j8pkDTKKS7RNouSXM7DgtuHF1_0bJgP5cUugXF4nsVyr0pM_cunSGe39Nh7Ig05j9ywDITBtzhOB4",
-    shelf: "Mood",
     slug: "sakura",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:RVBBboQwDPxK5HOKaNFWKtc-oceqBwOBRJAYOaYSWvH3dWClPURxPDOece4wEkcUaN8tJIwOWvjBeWMEC7iJJ9aOOI4rro61Objcc1glUFLk2zvm_a1bKGeKZg1pbk2mUQxT3o0Pk1_0SLZmckkWZzAN5mxVOkxwytD-QiQa9Fnkep0w_FmYGAdNdIeMopEuz7r6UmFIUsoPC-PJqav608LLr6j8pkDTKKS7RNouSXM7DgtuHF1_0bJgP5cUugXF4nsVyr0pM_cunSGe39Nh7Ig05j9ywDITBtzhOB4",
     theme: {
+      format: 1,
+      name: "Sakura",
       author: "termpaper",
       description: "Cherry-blossom pink: soft rosy highlights, gentle and light.",
-      effects: {
-        bloom: 0.5,
-        stack: [
-          "bloom"
-        ]
-      },
-      format: 1,
-      grade: {
-        fade: 0.05999999865889549,
-        highlights: {
-          amount: 0.3499999940395355,
-          hue: 330
-        },
-        saturation: 0.8999999761581421,
-        tint: 0.20000000298023224
-      },
-      name: "Sakura",
-      scene: {
-        name: "bamboo",
-        variant: "day"
-      },
       tags: [
         "mood",
         "pink",
         "light"
-      ]
-    },
-    yours: false
+      ],
+      grade: {
+        saturation: 0.9,
+        tint: 0.2,
+        fade: 0.06,
+        highlights: {
+          hue: 330,
+          amount: 0.35
+        }
+      },
+      effects: {
+        stack: [
+          "bloom"
+        ],
+        bloom: 0.5
+      },
+      scene: {
+        name: "bamboo",
+        variant: "day"
+      }
+    }
   },
   {
-    code: "tp1:PVBJbsMwDPyKwF6NIIvjFr73BT0WPdASvSCWaFC0gyLI30u5RW9jejbNA3qWiArtqYKEkaCFjzVlUqgAVx1Z7KIkccGFxI6Bspdp0YmT_XnfSL5d9pTIobqw5lvrtolnUpdHDHzPbkrKjgXTYJwU3MBzOJiT4pCh_YTIHOzzjhLhq4JBMFiNB2xTZyJv-Hg4G52iNUBdZb9cnhUsaDm6kyMXEaiFmZfnmWU3fzl1p-OlsdvLtTtjQwX5c103vqC-fvX124563zddKZBVKA06lpTr1WKo78lrLjFZ0d-K74gz7huY4B8XgfH3OQr7b9DyYHNELeEbyoRWsoX8u_Pz-QM",
-    shelf: "Mood",
     slug: "sunset",
+    shelf: "Mood",
+    yours: false,
+    code: "tp1:PVBJbsMwDPyKwF6NIIvjFr73BT0WPdASvSCWaFC0gyLI30u5RW9jejbNA3qWiArtqYKEkaCFjzVlUqgAVx1Z7KIkccGFxI6Bspdp0YmT_XnfSL5d9pTIobqw5lvrtolnUpdHDHzPbkrKjgXTYJwU3MBzOJiT4pCh_YTIHOzzjhLhq4JBMFiNB2xTZyJv-Hg4G52iNUBdZb9cnhUsaDm6kyMXEaiFmZfnmWU3fzl1p-OlsdvLtTtjQwX5c103vqC-fvX124563zddKZBVKA06lpTr1WKo78lrLjFZ0d-K74gz7huY4B8XgfH3OQr7b9DyYHNELeEbyoRWsoX8u_Pz-QM",
     theme: {
+      format: 1,
+      name: "Sunset",
       author: "termpaper",
       description: "Every scene at dusk: violet shadows into orange and gold.",
-      effects: {
-        halation: 0.5,
-        stack: [
-          "halation"
-        ]
-      },
-      format: 1,
+      tags: [
+        "mood",
+        "warm"
+      ],
       grade: {
-        temperature: 0.30000001192092896,
-        vibrance: 0.20000000298023224
+        vibrance: 0.2,
+        temperature: 0.3
       },
-      name: "Sunset",
       palette: {
+        mode: "tint",
         colors: [
           "#1b1036",
           "#5b2a6e",
@@ -3651,19 +3665,19 @@ var builtin_default = [
           "#f47c48",
           "#ffcf6b"
         ],
-        mode: "tint",
-        strength: 0.550000011920929
+        strength: 0.55
+      },
+      effects: {
+        stack: [
+          "halation"
+        ],
+        halation: 0.5
       },
       scene: {
         name: "goldengate",
         variant: "sunset"
-      },
-      tags: [
-        "mood",
-        "warm"
-      ]
-    },
-    yours: false
+      }
+    }
   }
 ];
 

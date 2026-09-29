@@ -176,6 +176,24 @@ export function sanitize(l: Look): Look {
   return l;
 }
 
+/** Equal but for float noise (an f32 written out as f64 differs in the
+ *  eighth place), effect strengths rounded to hundredths, and strengths of
+ *  1 left out: what sanitize does to a look that was already in range. */
+function sameLook(a: Look, b: Look): boolean {
+  const near = (x: unknown, y: unknown): boolean => {
+    if (typeof x === "number" && typeof y === "number") return Math.abs(x - y) < 1e-4;
+    if (Array.isArray(x) && Array.isArray(y)) return x.length === y.length && x.every((v, i) => near(v, y[i]));
+    if (x && y && typeof x === "object" && typeof y === "object") {
+      const kx = Object.keys(x);
+      return kx.length === Object.keys(y).length && kx.every((k) => near((x as Record<string, unknown>)[k], (y as Record<string, unknown>)[k]));
+    }
+    return x === y;
+  };
+  const names = new Set([...Object.keys(a.effects.amounts), ...Object.keys(b.effects.amounts)]);
+  const amountsOk = [...names].every((n) => Math.abs((a.effects.amounts[n] ?? 1) - (b.effects.amounts[n] ?? 1)) < 0.0051);
+  return near(a.grade, b.grade) && near(a.palette, b.palette) && near(a.effects.stack, b.effects.stack) && amountsOk;
+}
+
 /** `Theme::validate`: clean the theme up for use, returning what changed.
  *  Throws for what cannot be fixed: a newer format, no name. `scenes`, when
  *  given, is every scene and its variants (from the catalog). */
@@ -197,9 +215,9 @@ export function validate(t: Theme, scenes?: Map<string, string[]>): string[] {
   const before = t.look.effects.stack.length;
   t.look.effects.stack = t.look.effects.stack.filter((e) => (EFFECTS as readonly string[]).includes(e));
   if (t.look.effects.stack.length < before) w.push("dropped effects this termpaper does not have");
-  const raw = JSON.stringify(t.look);
+  const unclamped = structuredClone(t.look);
   sanitize(t.look);
-  if (JSON.stringify(t.look) !== raw) w.push("some values were out of range and were clamped");
+  if (!sameLook(unclamped, t.look)) w.push("some values were out of range and were clamped");
   if (t.scene && scenes) {
     const variants = scenes.get(t.scene.name);
     if (!variants) {
